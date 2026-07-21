@@ -13,15 +13,9 @@
             --bg-color: #fbf7ee;
             --card-bg: #ffffff;
             --primary-color: #2b4c3f;
-            --primary-hover: #1f372e;
             --text-main: #333333;
             --text-muted: #777777;
-            --accent-box: #f4f0e6;
             --border-color: #e5dec9;
-            --tag-green-bg: #e8f5e9;
-            --tag-green-text: #2e7d32;
-            --tag-blue-bg: #e3f2fd;
-            --tag-blue-text: #1565c0;
         }
 
         * {
@@ -180,7 +174,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .card-title {
@@ -193,16 +187,17 @@
         .code-type-tabs {
             display: flex;
             gap: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .code-type-btn {
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 12px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             border: 1px solid var(--border-color);
             background: #fff;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .code-type-btn.active {
@@ -212,21 +207,23 @@
         }
 
         .card-body {
-            background-color: #272822;
-            color: #f8f8f2;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
             border-radius: 8px;
-            padding: 12px;
+            padding: 14px;
             font-size: 0.85rem;
-            white-space: pre-wrap;
-            height: 220px;
-            overflow-y: auto;
+            white-space: pre;
+            height: 250px;
+            overflow: auto;
             margin-bottom: 15px;
             font-family: 'Courier New', Courier, monospace;
+            line-height: 1.4;
         }
 
         .card-footer {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            align-items: center;
         }
 
         .btn-copy {
@@ -234,23 +231,26 @@
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px;
+            padding: 10px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .btn-icon {
             background-color: #fff;
             border: 1px solid var(--border-color);
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 8px;
             cursor: pointer;
             color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-icon:hover {
@@ -430,23 +430,24 @@
     </div>
 
     <script>
-        // 從你的檔案中抓取到的完整真實資料
         const defaultCards = [
             {
                 title: "唐奇安通道",
-                tvCode: `//@version=5\nstrategy("黃金唐奇安通道 + EMA 趨勢過濾", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=20, currency=currency.USD)\n\n// 1. 參數輸入面板\ndc_length = input.int(10, title="唐奇安通道週期 (K線數量)", group="唐奇安通道參數")\nuse_ema_filter = input.bool(true, title="啟用 EMA 多空排列過濾", group="EMA 趨勢過濾")\n\ntp_sl_mode = input.string("ATR 動態模式", title="風控模式選擇", options=["ATR 動態模式", "固定美元模式"], group="風控機制設定")\n\natr_length  = input.int(14, title="ATR 週期", group="模式 A: ATR 參數")\natr_sl_mult = input.float(2.0, title="ATR 止損倍數", step=0.1, group="模式 A: ATR 參數")\natr_tp_mult = input.float(6.0, title="ATR 止盈倍數", step=0.1, group="模式 A: ATR 參數")\n\nfixed_sl_usd = input.float(8.0, title="固定止損美元", group="模式 B: 固定美元參數")\nfixed_tp_usd = input.float(24.0, title="固定止盈美元", group="模式 B: 固定美元參數")\n\n// 2. 指標計算\ndc_upper = ta.highest(high, dc_length)[1]\ndc_lower = ta.lowest(low, dc_length)[1]\ndc_mid   = (dc_upper + dc_lower) / 2\natr = ta.atr(atr_length)\n\nema20  = ta.ema(close, 20)\nema50  = ta.ema(close, 50)\nema100 = ta.ema(close, 100)\nema200 = ta.ema(close, 200)\n\n// 3. 訊號判斷\nis_bullish_ema = (ema20 > ema50) and (ema50 > ema100) and (ema100 > ema200)\nis_bearish_ema = (ema20 < ema50) and (ema50 < ema100) and (ema100 < ema200)\n\nlong_filter  = use_ema_filter ? is_bullish_ema : true\nshort_filter = use_ema_filter ? is_bearish_ema : true\n\nlong_condition  = ta.crossover(close, dc_upper) and long_filter\nshort_condition = ta.crossunder(close, dc_lower) and short_filter\n\n// 4. 止損止盈\nvar float long_sl = na\nvar float long_tp = na\nvar float short_sl = na\nvar float short_tp = na\n\nif (long_condition)\n    if (tp_sl_mode == "ATR 動態模式")\n        long_sl := close - (atr * atr_sl_mult)\n        long_tp := close + (atr * atr_tp_mult)\n    else\n        long_sl := close - fixed_sl_usd\n        long_tp := close + fixed_tp_usd\n\nif (short_condition)\n    if (tp_sl_mode == "ATR 動態模式")\n        short_sl := close + (atr * atr_sl_mult)\n        short_tp := close - (atr * atr_tp_mult)\n    else\n        short_sl := close + fixed_sl_usd\n        short_tp := close - fixed_tp_usd\n\n// 5. 執行進場與出場\nif (long_condition)\n    strategy.entry("DC_Long", strategy.long)\nif (short_condition)\n    strategy.entry("DC_Short", strategy.short)\n\nif (strategy.position_size > 0)\n    strategy.exit("Exit_Long", "DC_Long", stop=long_sl, limit=long_tp)\nif (strategy.position_size < 0)\n    strategy.exit("Exit_Short", "DC_Short", stop=short_sl, limit=short_tp)`,
-                autoCode: `// DEFINE STRATEGY SETTINGS\nDEFPARAM CumulateOrders = False // 停用加碼，保持單一部位\n\n// 1. 5分鐘黃金優化參數設定\ninitCapital  = 10000     // 自行定義初始資金 (美元)\ndcLength     = 10        // 唐奇安通道週期\ntpSlMode     = 1         // 1 = ATR 動態模式, 2 = 固定值模式\natrLength    = 14        // ATR 週期\natrSlMult    = 2.5       // 5分K止損：2.5 倍 ATR\natrTpMult    = 3.5       // 5分K止盈：3.5 倍 ATR\nfixedSlUsd   = 3.0\nfixedTpUsd   = 9.0\n\n// 2. 指標計算\ndcUpper = Highest[dcLength](High)[1]\ndcLower = Lowest[dcLength](Low)[1]\ndcMid   = (dcUpper + dcLower) / 2\nmyAtr   = AverageTrueRange[atrLength]\n\n// 3. 訊號與執行\nlongCondition  = (close CROSSES OVER dcUpper)\nshortCondition = (close CROSSES UNDER dcLower)\n\nIF tpSlMode = 1 THEN\nslDistance = myAtr * atrSlMult\ntpDistance = myAtr * atrTpMult\nELSE\nslDistance = fixedSlUsd\ntpDistance = fixedTpUsd\nENDIF\n\nmyCapital = StrategyProfit + initCapital\ninvestAmount = myCapital * 0.20\ncalculatedSize = ROUND((investAmount / close) * 100) / 100\npositionSize   = MAX(0.01, calculatedSize)\n\nIF longCondition AND NOT LongOnMarket THEN\nBUY positionSize CONTRACTS AT MARKET\nSET STOP LOSS slDistance\nSET TARGET PROFIT tpDistance\nENDIF\n\nIF shortCondition AND NOT ShortOnMarket THEN\nSELLSHORT positionSize CONTRACTS AT MARKET\nSET STOP LOSS slDistance\nSET TARGET PROFIT tpDistance\nENDIF`
+                tvCode: `//@version=5\nstrategy("黃金唐奇安通道 + EMA 趨勢過濾", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=20, currency=currency.USD)\n\n// ==========================================\n// 1. 參數輸入面板 (Inputs)\n// ==========================================\ndc_length = input.int(10, title="唐奇安通道週期 (K線數量)", group="唐奇安通道參數")\nuse_ema_filter = input.bool(true, title="啟用 EMA 多空排列過濾", group="EMA 趨勢過濾")\n\ntp_sl_mode = input.string("ATR 動態模式", title="風控模式選擇", options=["ATR 動態模式", "固定美元模式"], group="風控機制設定")\n\natr_length  = input.int(14, title="ATR 週期", group="模式 A: ATR 參數")\natr_sl_mult = input.float(2.0, title="ATR 止損倍數", step=0.1, group="模式 A: ATR 參數")\natr_tp_mult = input.float(6.0, title="ATR 止盈倍數", step=0.1, group="模式 A: ATR 參數")\n\nfixed_sl_usd = input.float(8.0, title="固定止損美元", group="模式 B: 固定美元參數")\nfixed_tp_usd = input.float(24.0, title="固定止盈美元", group="模式 B: 固定美元參數")\n\n// ==========================================\n// 2. 技術指標計算 (Indicators)\n// ==========================================\ndc_upper = ta.highest(high, dc_length)[1]\ndc_lower = ta.lowest(low, dc_length)[1]\ndc_mid   = (dc_upper + dc_lower) / 2\natr = ta.atr(atr_length)\n\n// EMA 均線系統 (20, 50, 100, 200)\nema20  = ta.ema(close, 20)\nema50  = ta.ema(close, 50)\nema100 = ta.ema(close, 100)\nema200 = ta.ema(close, 200)\n\nplot(ema20,  color=color.new(color.green, 50),  title="EMA 20")\nplot(ema50,  color=color.new(color.blue, 50),   title="EMA 50")\nplot(ema100, color=color.new(color.orange, 50), title="EMA 100")\nplot(ema200, color=color.new(color.red, 50),    title="EMA 200", linewidth=2)\n\n// ==========================================\n// 3. 核心交易訊號與 EMA 濾網 (Signals)\n// ==========================================\nis_bullish_ema = (ema20 > ema50) and (ema50 > ema100) and (ema100 > ema200)\nis_bearish_ema = (ema20 < ema50) and (ema50 < ema100) and (ema100 < ema200)\n\nlong_filter  = use_ema_filter ? is_bullish_ema : true\nshort_filter = use_ema_filter ? is_bearish_ema : true\n\nlong_condition  = ta.crossover(close, dc_upper) and long_filter\nshort_condition = ta.crossunder(close, dc_lower) and short_filter\n\n// ==========================================\n// 4. 記憶進場時的止損止盈價格 (SL/TP Pricing)\n// ==========================================\nvar float long_sl = na\nvar float long_tp = na\nvar float short_sl = na\nvar float short_tp = na\n\nif (long_condition)\n    if (tp_sl_mode == "ATR 動態模式")\n        long_sl := close - (atr * atr_sl_mult)\n        long_tp := close + (atr * atr_tp_mult)\n    else\n        long_sl := close - fixed_sl_usd\n        long_tp := close + fixed_tp_usd\n\nif (short_condition)\n    if (tp_sl_mode == "ATR 動態模式")\n        short_sl := close + (atr * atr_sl_mult)\n        short_tp := close - (atr * atr_tp_mult)\n    else\n        short_sl := close + fixed_sl_usd\n        short_tp := close - fixed_tp_usd\n\n// ==========================================\n// 5. 執行進場與智慧出場基準 (Execution)\n// ==========================================\nif (long_condition)\n    strategy.entry("DC_Long", strategy.long)\n\nif (short_condition)\n    strategy.entry("DC_Short", strategy.short)\n\nif (strategy.position_size > 0)\n    strategy.exit("Exit_Long", "DC_Long", stop=long_sl, limit=long_tp)\n\nif (strategy.position_size < 0)\n    strategy.exit("Exit_Short", "DC_Short", stop=short_sl, limit=short_tp)\n\n// ==========================================\n// 6. 圖表視覺化呈現 (Visuals)\n// ==========================================\nplot(dc_upper, title="通道上軌 (壓力)", color=color.new(color.blue, 40), linewidth=1)\nplot(dc_lower, title="通道下軌 (支撐)", color=color.new(color.blue, 40), linewidth=1)\nplot(dc_mid, title="通道中線", color=color.new(color.gray, 70), style=plot.style_line)\n\nplotshape(long_condition, title="突破做多", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)\nplotshape(short_condition, title="跌破做空", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)`,
+                autoCode: `// DEFINE STRATEGY SETTINGS\nDEFPARAM CumulateOrders = False // 停用加碼，保持單一部位\n\n// ==========================================\n// 1. 5分鐘黃金優化參數設定\n// ==========================================\ninitCapital  = 10000     // 自行定義初始資金 (美元)\ndcLength     = 10        // 唐奇安通道週期\ntpSlMode     = 1         // 1 = ATR 動態模式, 2 = 固定值模式\natrLength    = 14        // ATR 週期\natrSlMult    = 2.5       // 5分K止損：2.5 倍 ATR\natrTpMult    = 3.5       // 5分K止盈：3.5 倍 ATR\nfixedSlUsd   = 3.0\nfixedTpUsd   = 9.0\n\n// ==========================================\n// 2. 技術指標計算 (Indicators)\n// ==========================================\ndcUpper = Highest[dcLength](High)[1]   // [1] = 取前一根K棒為止的通道高點，避免自我參照\ndcLower = Lowest[dcLength](Low)[1]     // [1] = 取前一根K棒為止的通道低點，避免自我參照\ndcMid   = (dcUpper + dcLower) / 2\nmyAtr   = AverageTrueRange[atrLength]\n\n// ==========================================\n// 3. 核心交易訊號（測試版：暫時移除 EMA 濾網與時間濾網）\n// ==========================================\nlongCondition  = (close CROSSES OVER dcUpper)\nshortCondition = (close CROSSES UNDER dcLower)\n\n// ==========================================\n// 4. 計算止損與止盈距離 (Distance Points/Price)\n// ==========================================\nIF tpSlMode = 1 THEN\nslDistance = myAtr * atrSlMult\ntpDistance = myAtr * atrTpMult\nELSE\nslDistance = fixedSlUsd\ntpDistance = fixedTpUsd\nENDIF\n\n// ==========================================\n// 5. 執行進場與止損止盈設定 (Execution)\n// ==========================================\nmyCapital = StrategyProfit + initCapital\ninvestAmount = myCapital * 0.20\ncalculatedSize = ROUND((investAmount / close) * 100) / 100\npositionSize   = MAX(0.01, calculatedSize)\n\n// 做多進場\nIF longCondition AND NOT LongOnMarket THEN\nBUY positionSize CONTRACTS AT MARKET\nSET STOP LOSS slDistance\nSET TARGET PROFIT tpDistance\nENDIF\n\n// 做空進場\nIF shortCondition AND NOT ShortOnMarket THEN\nSELLSHORT positionSize CONTRACTS AT MARKET\nSET STOP LOSS slDistance\nSET TARGET PROFIT tpDistance\nENDIF`
             },
             {
                 title: "金字塔",
-                tvCode: `//@version=5\nstrategy("黃金突破 + EMA + 金字塔加倉 (2.5手固定倉位版)", overlay=true, initial_capital=8000, pyramiding=5, default_qty_type=strategy.fixed, default_qty_value=2.5, currency=currency.USD)\n\n// 1. 參數輸入面板\nvar string grp1 = "進場與趨勢過濾"\ndc_length = input.int(10, title="唐奇安通道週期", group=grp1)\nuse_ema   = input.bool(true, title="啟用 EMA 多空排列過濾", group=grp1)\n\nvar string grp2 = "下單與加倉設定"\nbase_qty = input.float(2.5, title="初始進場數量 (手/口)", group=grp2)\nadd_qty  = input.float(0.5, title="每次加碼數量 (手/口)", group=grp2)\nadd_step = input.float(8.0, title="加倉觸發間距 (USD)", group=grp2)\n\nvar string grp3 = "移動停損設定 (Trailing Stop)"\ntrail_dist = input.float(20.0, title="最高/低點回撤平倉距離 (USD)", group=grp3)\n\n// 2. 指標計算\ndc_upper = ta.highest(high, dc_length)[1]\ndc_lower = ta.lowest(low, dc_length)[1]\n\nema20  = ta.ema(close, 20)\nema50  = ta.ema(close, 50)\nema100 = ta.ema(close, 100)\nema200 = ta.ema(close, 200)\n\nis_bullish = (ema20 > ema50) and (ema50 > ema100) and (ema100 > ema200)\nis_bearish = (ema20 < ema50) and (ema50 < ema100) and (ema100 < ema200)\n\nlong_cond  = ta.crossover(close, dc_upper) and (use_ema ? is_bullish : true)\nshort_cond = ta.crossunder(close, dc_lower) and (use_ema ? is_bearish : true)\n\n// 3. 執行進場\nif long_cond and strategy.opentrades == 0\n    strategy.entry("Long_Base", strategy.long, qty=base_qty)`,
-                autoCode: `// 策略名稱：黃金突破 + EMA + 金字塔加倉 (ProOrder 實盤/自動交易版)\n// 本金規劃：$8,000 USD | 初始：2.5手 | 加碼：0.5手\n\nDEFPARAM CumulateOrders = True  // 啟用金字塔加倉機制\n\nDCLength   = 10      // 唐奇安通道週期\nUseEMA     = 1       // 啟用 EMA 過濾\nAddStep    = 8.0     // 加倉觸發間距 (8 USD)\nBaseQty    = 2.5     // 初始手數\nAddQty     = 0.5     // 加碼手數\nTrailDist  = 20.0    // 追蹤停損 (20 USD)\n\nDCCUpper = HIGHEST[DCLength](HIGH)[1]\nDCCLower = LOWEST[DCLength](LOW)[1]\n\nEMA20  = ExponentialAverage[20](CLOSE)\nEMA50  = ExponentialAverage[50](CLOSE)\nEMA100 = ExponentialAverage[100](CLOSE)\nEMA200 = ExponentialAverage[200](CLOSE)\n\nIsBullish = (EMA20 > EMA50) AND (EMA50 > EMA100) AND (EMA100 > EMA200)\nIsBearish = (EMA20 < EMA50) AND (EMA50 < EMA100) AND (EMA100 < EMA200)\n\nLongCond  = (CLOSE CROSSES OVER DCCUpper) AND (UseEMA = 0 OR IsBullish)\nShortCond = (CLOSE CROSSES UNDER DCCLower) AND (UseEMA = 0 OR IsBearish)\n\nIF NOT ONMARKET THEN\nPosHigh = 0\nPosLow = 0\nLastEntryPrice = 0\nENDIF\n\nIF LONGONMARKET THEN\nIF PosHigh = 0 THEN PosHigh = HIGH ELSE PosHigh = MAX(PosHigh, HIGH) ENDIF\nLongStopPrice = PosHigh - TrailDist\nSELL AT LongStopPrice STOP\n\nIF CLOSE >= LastEntryPrice + AddStep THEN\nBUY AddQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nENDIF\nENDIF\n\nIF NOT ONMARKET THEN\nIF LongCond THEN\nBUY BaseQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nPosHigh = HIGH\nELSIF ShortCond THEN\nSELLSHORT BaseQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nPosLow = LOW\nENDIF\nENDIF`
+                tvCode: `//@version=5\nstrategy("黃金突破 + EMA + 金字塔加倉 (2.5手固定倉位版)", overlay=true, initial_capital=8000, pyramiding=5, default_qty_type=strategy.fixed, default_qty_value=2.5, currency=currency.USD)\n\n// ==========================================\n// 1. 參數輸入面板 (Inputs)\n// ==========================================\nvar string grp1 = "進場與趨勢過濾"\ndc_length = input.int(10, title="唐奇安通道週期", group=grp1)\nuse_ema   = input.bool(true, title="啟用 EMA 多空排列過濾", group=grp1)\n\nvar string grp2 = "下單與加倉設定"\nbase_qty = input.float(2.5, title="初始進場數量 (手/口)", group=grp2)\nadd_qty  = input.float(0.5, title="每次加碼數量 (手/口)", group=grp2)\nadd_step = input.float(8.0, title="加倉觸發間距 (USD)", group=grp2)\n\nvar string grp3 = "移動停損設定 (Trailing Stop)"\ntrail_dist = input.float(20.0, title="最高/低點回撤平倉距離 (USD)", group=grp3)\n\n// ==========================================\n// 2. 指標計算 (EMA 系統與通道)\n// ==========================================\ndc_upper = ta.highest(high, dc_length)[1]\ndc_lower = ta.lowest(low, dc_length)[1]\n\nema20  = ta.ema(close, 20)\nema50  = ta.ema(close, 50)\nema100 = ta.ema(close, 100)\nema200 = ta.ema(close, 200)\n\nplot(ema20,  color=color.new(color.green, 50),  title="EMA 20")\nplot(ema50,  color=color.new(color.blue, 50),   title="EMA 50")\nplot(ema100, color=color.new(color.orange, 50), title="EMA 100")\nplot(ema200, color=color.new(color.red, 50),    title="EMA 200", linewidth=2)\n\nis_bullish = (ema20 > ema50) and (ema50 > ema100) and (ema100 > ema200)\nis_bearish = (ema20 < ema50) and (ema50 < ema100) and (ema100 < ema200)\n\nlong_cond  = ta.crossover(close, dc_upper) and (use_ema ? is_bullish : true)\nshort_cond = ta.crossunder(close, dc_lower) and (use_ema ? is_bearish : true)\n\n// ==========================================\n// 3. 執行進場與加碼 (Execution)\n// ==========================================\nvar float last_entry_price = na\n\n// 初次進場 (固定 2.5 手)\nif long_cond and strategy.opentrades == 0\n    strategy.entry("Long_Base", strategy.long, qty=base_qty)`,
+                autoCode: `// ==========================================\n// 策略名稱：黃金突破 + EMA + 金字塔加倉 (ProOrder 實盤/自動交易版)\n// 本金規劃：$8,000 USD | 初始：2.5手 | 加碼：0.5手\n// 適用平台：ProRealTime ProOrder\n// ==========================================\n\n// ------------------------------------------\n// 1. 參數設定\n// ------------------------------------------\nDEFPARAM CumulateOrders = True  // 啟用金字塔加倉機制\n\nDCLength   = 10      // 唐奇安通道週期\nUseEMA     = 1       // 啟用 EMA 過濾 (1 = 啟用, 0 = 停用)\nAddStep    = 8.0     // 加倉觸發間距 (價格移動 8 USD)\nBaseQty    = 2.5     // 初始進場手數：2.5 手\nAddQty     = 0.5     // 每次加碼手數：0.5 手\nTrailDist  = 20.0    // 追蹤停損距離 (USD)\n\n// ------------------------------------------\n// 2. 指標計算 (EMA 與通道)\n// ------------------------------------------\nDCCUpper = HIGHEST[DCLength](HIGH)[1]\nDCCLower = LOWEST[DCLength](LOW)[1]\n\nEMA20  = ExponentialAverage[20](CLOSE)\nEMA50  = ExponentialAverage[50](CLOSE)\nEMA100 = ExponentialAverage[100](CLOSE)\nEMA200 = ExponentialAverage[200](CLOSE)\n\nIsBullish = (EMA20 > EMA50) AND (EMA50 > EMA100) AND (EMA100 > EMA200)\nIsBearish = (EMA20 < EMA50) AND (EMA50 < EMA100) AND (EMA100 < EMA200)\n\nLongCond  = (CLOSE CROSSES OVER DCCUpper) AND (UseEMA = 0 OR IsBullish)\nShortCond = (CLOSE CROSSES UNDER DCCLower) AND (UseEMA = 0 OR IsBearish)\n\n// ------------------------------------------\n// 3. 持倉狀態與追蹤停損 / 加碼邏輯\n// ------------------------------------------\nIF NOT ONMARKET THEN\nPosHigh = 0\nPosLow = 0\nLastEntryPrice = 0\nENDIF\n\n// --- 多頭持倉控管 ---\nIF LONGONMARKET THEN\nIF PosHigh = 0 THEN\nPosHigh = HIGH\nELSE\nPosHigh = MAX(PosHigh, HIGH)\nENDIF\n    \n// 計算多頭移動停損\nLongStopPrice = PosHigh - TrailDist\nSELL AT LongStopPrice STOP\n    \n// 多頭加碼：價格超越上次進場價 + AddStep 時，加碼 0.5 手\nIF CLOSE >= LastEntryPrice + AddStep THEN\nBUY AddQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nENDIF\nENDIF\n\n// --- 空頭持倉控管 ---\nIF SHORTONMARKET THEN\nIF PosLow = 0 THEN\nPosLow = LOW\nELSE\nPosLow = MIN(PosLow, LOW)\nENDIF\n    \n// 計算空頭移動停損\nShortStopPrice = PosLow + TrailDist\nEXITSHORT AT ShortStopPrice STOP\n    \n// 空頭加碼：價格低於上次進場價 - AddStep 時，加碼 0.5 手\nIF CLOSE <= LastEntryPrice - AddStep THEN\nSELLSHORT AddQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nENDIF\nENDIF\n\n// ------------------------------------------\n// 4. 初次進場執行 (Base Entry)\n// ------------------------------------------\nIF NOT ONMARKET THEN\nIF LongCond THEN\nBUY BaseQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nPosHigh = HIGH\nELSIF ShortCond THEN\nSELLSHORT BaseQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nPosLow = LOW\nENDIF\nENDIF`
             }
         ];
 
+        // 為了確保舊的快取資料不會污染網頁，重新載入或寫入 localStorage
+        localStorage.removeItem('tv_code_cards'); 
         let cards = JSON.parse(localStorage.getItem('tv_code_cards')) || defaultCards;
         let todos = JSON.parse(localStorage.getItem('tv_todos')) || [];
-        let cardTabStates = {}; // 紀錄每張卡片目前看的是 'tv' 還是 'auto'
+        let cardTabStates = {};
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -495,8 +496,8 @@
                         <div class="card-body">${escapeHtml(codeToShow || '無程式碼資料')}</div>
                     </div>
                     <div class="card-footer">
-                        <button class="btn-copy" onclick="copyContent(\`${escapeJs(codeToShow)}\`)">
-                            <i class="fa-regular fa-copy"></i> 複製此段程式碼
+                        <button class="btn-copy" onclick="copyByIndex(${realIndex}, '${currentView}')">
+                            <i class="fa-regular fa-copy"></i> 複製程式碼
                         </button>
                         <button class="btn-icon" onclick="openModal(${realIndex})" title="修改">
                             <i class="fa-solid fa-pen-to-square"></i>
@@ -514,12 +515,10 @@
             return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
         }
 
-        function escapeJs(text) {
-            return text ? text.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\${/g, '\\${') : '';
-        }
-
-        function copyContent(text) {
-            navigator.clipboard.writeText(text).then(() => {
+        function copyByIndex(realIndex, currentView) {
+            const card = cards[realIndex];
+            const textToCopy = currentView === 'tv' ? card.tvCode : card.autoCode;
+            navigator.clipboard.writeText(textToCopy).then(() => {
                 alert('程式碼已成功複製到剪貼簿！');
             });
         }
