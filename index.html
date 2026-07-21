@@ -734,13 +734,30 @@
                 return false;
             }
 
-            const newSignature = JSON.stringify(newCards);
+            // ===== 合併邏輯：以「標題」比對，試算表資料會更新/新增，
+            // 但手動新增、試算表裡還沒有的卡片會保留，不會被刪除 =====
+            const mergedCards = cards.map(c => ({ ...c })); // 從目前的卡片開始（保留手動新增的）
+            const titleIndex = new Map();
+            mergedCards.forEach((c, i) => titleIndex.set(c.title, i));
+
+            newCards.forEach(sheetCard => {
+                if (titleIndex.has(sheetCard.title)) {
+                    // 試算表裡有同標題 → 用試算表內容覆蓋這一筆
+                    mergedCards[titleIndex.get(sheetCard.title)] = sheetCard;
+                } else {
+                    // 試算表裡的新標題 → 新增
+                    mergedCards.push(sheetCard);
+                    titleIndex.set(sheetCard.title, mergedCards.length - 1);
+                }
+            });
+
+            const newSignature = JSON.stringify(mergedCards);
             if (newSignature === lastCardsSignature) {
                 return false;
             }
 
             lastCardsSignature = newSignature;
-            cards = newCards;
+            cards = mergedCards;
             localStorage.setItem('tv_code_cards', JSON.stringify(cards));
             renderCards();
             return true;
