@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>程式碼寶庫 & 待辦事項</title>
+    <title>TradingView 交易策略寶庫 & 待辦事項</title>
     <!-- FontAwesome 圖示 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -16,12 +16,10 @@
             --primary-hover: #1f372e;
             --text-main: #333333;
             --text-muted: #777777;
-            --accent-box: #f5f0e3;
+            --accent-box: #f4f0e6;
             --border-color: #e5dec9;
             --tag-green-bg: #e8f5e9;
             --tag-green-text: #2e7d32;
-            --tag-orange-bg: #fff3e0;
-            --tag-orange-text: #e65100;
             --tag-blue-bg: #e3f2fd;
             --tag-blue-text: #1565c0;
         }
@@ -43,7 +41,7 @@
             min-height: 100vh;
         }
 
-        /* 頂部分頁導覽列 */
+        /* 導覽列 */
         .nav-tabs {
             display: flex;
             gap: 15px;
@@ -67,7 +65,6 @@
             color: #fff;
         }
 
-        /* 標題區域 */
         .header {
             text-align: center;
             margin-bottom: 25px;
@@ -75,7 +72,6 @@
 
         .header h1 {
             font-size: 2.2rem;
-            letter-spacing: 2px;
             color: #222;
             margin-bottom: 8px;
         }
@@ -98,14 +94,12 @@
             text-decoration: none;
             font-size: 0.9rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            transition: background 0.2s;
         }
 
         .sheet-link-btn:hover {
             background-color: #f0ebd9;
         }
 
-        /* 主要內容區域容器 */
         .tab-content {
             display: none;
             width: 100%;
@@ -116,7 +110,7 @@
             display: block;
         }
 
-        /* --- 程式碼寶庫頁面樣式 --- */
+        /* 搜尋列 */
         .search-box {
             position: relative;
             max-width: 600px;
@@ -131,7 +125,6 @@
             outline: none;
             font-size: 1rem;
             background: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
 
         .search-box i {
@@ -142,50 +135,11 @@
             color: #aaa;
         }
 
-        .filter-group {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .filter-title {
-            font-size: 0.75rem;
-            color: #aaa;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .filter-options {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-        }
-
-        .filter-btn {
-            background-color: #fff;
-            border: 1px solid var(--border-color);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.88rem;
-            cursor: pointer;
-            color: #555;
-            transition: 0.2s;
-        }
-
-        .filter-btn.active, .filter-btn:hover {
-            background-color: var(--primary-color);
-            color: #fff;
-            border-color: var(--primary-color);
-        }
-
         .action-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            padding: 0 10px;
         }
 
         .add-card-btn {
@@ -198,10 +152,17 @@
             font-weight: 500;
         }
 
+        /* 卡片網格 */
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
             gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .card {
@@ -213,7 +174,6 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            position: relative;
         }
 
         .card-header {
@@ -223,40 +183,45 @@
             margin-bottom: 10px;
         }
 
-        .card-tag {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        .tag-green { background: var(--tag-green-bg); color: var(--tag-green-text); }
-        .tag-orange { background: var(--tag-orange-bg); color: var(--tag-orange-text); }
-        .tag-blue { background: var(--tag-blue-bg); color: var(--tag-blue-text); }
-
-        .card-no {
-            font-size: 0.8rem;
-            color: #bbb;
-        }
-
         .card-title {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 12px;
             color: #222;
         }
 
+        /* 切換 TV / 自動化頁籤 */
+        .code-type-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .code-type-btn {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .code-type-btn.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
         .card-body {
-            background-color: var(--accent-box);
+            background-color: #272822;
+            color: #f8f8f2;
             border-radius: 8px;
             padding: 12px;
             font-size: 0.85rem;
-            color: #444;
             white-space: pre-wrap;
-            max-height: 150px;
+            height: 220px;
             overflow-y: auto;
             margin-bottom: 15px;
-            font-family: monospace;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         .card-footer {
@@ -282,7 +247,7 @@
         .btn-icon {
             background-color: #fff;
             border: 1px solid var(--border-color);
-            padding: 8px 10px;
+            padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
             color: #555;
@@ -292,7 +257,7 @@
             background-color: #f0e6d2;
         }
 
-        /* --- 待辦事項頁面樣式 --- */
+        /* 待辦事項頁面 */
         .todo-container {
             background-color: #fff;
             border-radius: 16px;
@@ -349,12 +314,6 @@
             cursor: pointer;
         }
 
-        .todo-item-left input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary-color);
-        }
-
         .delete-todo-btn {
             background: none;
             border: none;
@@ -362,7 +321,7 @@
             cursor: pointer;
         }
 
-        /* Modal 彈出視窗 (用於新增/修改程式碼) */
+        /* Modal 彈窗 */
         .modal {
             display: none;
             position: fixed;
@@ -378,13 +337,13 @@
             padding: 25px;
             border-radius: 16px;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        .modal-content input, .modal-content textarea, .modal-content select {
+        .modal-content input, .modal-content textarea {
             padding: 10px;
             border-radius: 8px;
             border: 1px solid #ccc;
@@ -394,13 +353,13 @@
         .modal-content textarea {
             height: 120px;
             resize: vertical;
+            font-family: monospace;
         }
 
         .modal-buttons {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            margin-top: 10px;
         }
 
         .btn-cancel { background: #ccc; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
@@ -409,73 +368,60 @@
 </head>
 <body>
 
-    <!-- 主頁籤導覽 -->
+    <!-- 頁籤選單 -->
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('code-tab')"><i class="fa-solid fa-code"></i> 程式碼寶庫</button>
+        <button class="tab-btn active" onclick="switchTab('code-tab')"><i class="fa-solid fa-code"></i> 交易程式碼寶庫</button>
         <button class="tab-btn" onclick="switchTab('todo-tab')"><i class="fa-solid fa-list-check"></i> 待辦事項</button>
     </div>
 
-    <!-- ===== 分頁一：程式碼寶庫 ===== -->
+    <!-- ===== 分頁一：交易程式碼 ===== -->
     <div id="code-tab" class="tab-content active">
         <div class="header">
-            <h1>Code & Prompt 智能寶庫</h1>
-            <p>精選整理的提示詞與程式碼典藏，依類型與分類篩選、隨手取用</p>
+            <h1>TradingView 交易策略寶庫</h1>
+            <p>即時查閱 TradingView Pine Script 與自動化交易程式碼</p>
             <a href="https://docs.google.com/spreadsheets/d/1u4KvOKEwK-fySVfVHKu_jTC3JNyNHWXza6E1pv-4Jbo/edit?gid=68707879#gid=68707879" target="_blank" class="sheet-link-btn">
                 <i class="fa-solid fa-file-excel" style="color: #1d6f42;"></i> 開啟原始資料 Google Sheet
             </a>
         </div>
 
-        <!-- 搜尋列 -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" placeholder="搜尋提示詞、程式碼、分類或關鍵字..." oninput="renderCards()">
+            <input type="text" id="searchInput" placeholder="搜尋策略名稱或關鍵字..." oninput="renderCards()">
         </div>
 
-        <!-- 分類篩選區 -->
-        <div class="filter-group">
-            <div class="filter-title">分類．CATEGORY</div>
-            <div class="filter-options" id="categoryFilters">
-                <!-- 動態生成分類按鈕 -->
-            </div>
-        </div>
-
-        <!-- 功能列：筆數與新增按鈕 -->
         <div class="action-bar">
-            <span style="color: var(--text-muted); font-size: 0.9rem;" id="cardCount">共 0 筆結果</span>
-            <button class="add-card-btn" onclick="openModal()"><i class="fa-solid fa-plus"></i> 新增資料</button>
+            <span style="color: var(--text-muted); font-size: 0.9rem;" id="cardCount">共 0 筆策略</span>
+            <button class="add-card-btn" onclick="openModal()"><i class="fa-solid fa-plus"></i> 新增策略程式碼</button>
         </div>
 
-        <!-- 卡片容器 -->
-        <div class="card-grid" id="cardGrid">
-            <!-- 動態生成卡片 -->
-        </div>
+        <div class="card-grid" id="cardGrid"></div>
     </div>
 
     <!-- ===== 分頁二：待辦事項 ===== -->
     <div id="todo-tab" class="tab-content">
         <div class="header">
             <h1>待辦事項管理</h1>
-            <p>記錄待開發功能或日常任務</p>
+            <p>記錄策略優化、參數調校與待辦任務</p>
         </div>
         <div class="todo-container">
             <div class="todo-input-group">
                 <input type="text" id="todoInput" placeholder="請輸入待辦事項..." onkeypress="if(event.key==='Enter') addTodo()">
                 <button onclick="addTodo()"><i class="fa-solid fa-plus"></i> 新增</button>
             </div>
-            <ul class="todo-list" id="todoList">
-                <!-- 動態生成待辦事項 -->
-            </ul>
+            <ul class="todo-list" id="todoList"></ul>
         </div>
     </div>
 
-    <!-- ===== 編輯/新增 Modal ===== -->
+    <!-- ===== 新增/修改 Modal ===== -->
     <div class="modal" id="cardModal">
         <div class="modal-content">
-            <h3 id="modalTitle">新增資料</h3>
+            <h3 id="modalTitle">新增策略</h3>
             <input type="hidden" id="editIndex">
-            <input type="text" id="inputCategory" placeholder="分類 (例如: 程式應用、簡報表達)">
-            <input type="text" id="inputTitle" placeholder="標題">
-            <textarea id="inputContent" placeholder="程式碼或 Prompt 內容..."></textarea>
+            <input type="text" id="inputTitle" placeholder="策略標題 (例：唐奇安通道)">
+            <label style="font-size: 0.85rem; color: #555;">TradingView 程式碼 (Pine Script)</label>
+            <textarea id="inputTvCode" placeholder="貼上 TradingView 程式碼..."></textarea>
+            <label style="font-size: 0.85rem; color: #555;">自動化程式碼 (ProOrder / API)</label>
+            <textarea id="inputAutoCode" placeholder="貼上自動化交易程式碼..."></textarea>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">取消</button>
                 <button class="btn-save" onclick="saveCard()">儲存</button>
@@ -484,81 +430,73 @@
     </div>
 
     <script>
-        // 預設範例資料 (根據試算表結構與樣式)
-        const initialCards = [
-            { id: "No. 001", category: "程式應用", title: "除錯梳理", content: "請先不要急著修改程式。根據你的分析，將每一個驗證與檢查的過程，逐一寫入除錯流程中..." },
-            { id: "No. 002", category: "簡報表達", title: "簡報結構", content: "針對簡報的結構美，給我相關的建議。定義：強調簡報內容的條理與邏輯性..." },
-            { id: "No. 003", category: "程式生成", title: "表單生成", content: "依據附件，為我設計一份「課前需求調查問卷」，題目約 10~12 題，並直接提供可執行的 Google Apps Script (GAS)..." },
-            { id: "No. 004", category: "文本優化", title: "課程推廣", content: "# 你是一名社群小編，擅長撰寫課程推廣文案，將我提供給資訊變成 PO 文..." }
+        // 從你的檔案中抓取到的完整真實資料
+        const defaultCards = [
+            {
+                title: "唐奇安通道",
+                tvCode: `//@version=5\nstrategy("黃金唐奇安通道 + EMA 趨勢過濾", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=20, currency=currency.USD)\n\n// 1. 參數輸入面板\ndc_length = input.int(10, title="唐奇安通道週期 (K線數量)", group="唐奇安通道參數")\nuse_ema_filter = input.bool(true, title="啟用 EMA 多空排列過濾", group="EMA 趨勢過濾")\n\ntp_sl_mode = input.string("ATR 動態模式", title="風控模式選擇", options=["ATR 動態模式", "固定美元模式"], group="風控機制設定")\n\natr_length  = input.int(14, title="ATR 週期", group="模式 A: ATR 參數")\natr_sl_mult = input.float(2.0, title="ATR 止損倍數", step=0.1, group="模式 A: ATR 參數")\natr_tp_mult = input.float(6.0, title="ATR 止盈倍數", step=0.1, group="模式 A: ATR 參數")\n\nfixed_sl_usd = input.float(8.0, title="固定止損美元", group="模式 B: 固定美元參數")\nfixed_tp_usd = input.float(24.0, title="固定止盈美元", group="模式 B: 固定美元參數")\n\n// 2. 指標計算\ndc_upper = ta.highest(high, dc_length)[1]\ndc_lower = ta.lowest(low, dc_length)[1]\ndc_mid   = (dc_upper + dc_lower) / 2\natr = ta.atr(atr_length)\n\nema20  = ta.ema(close, 20)\nema50  = ta.ema(close, 50)\nema100 = ta.ema(close, 100)\nema200 = ta.ema(close, 200)\n\n// 3. 訊號判斷\nis_bullish_ema = (ema20 > ema50) and (ema50 > ema100) and (ema100 > ema200)\nis_bearish_ema = (ema20 < ema50) and (ema50 < ema100) and (ema100 < ema200)\n\nlong_filter  = use_ema_filter ? is_bullish_ema : true\nshort_filter = use_ema_filter ? is_bearish_ema : true\n\nlong_condition  = ta.crossover(close, dc_upper) and long_filter\nshort_condition = ta.crossunder(close, dc_lower) and short_filter\n\n// 4. 止損止盈\nvar float long_sl = na\nvar float long_tp = na\nvar float short_sl = na\nvar float short_tp = na\n\nif (long_condition)\n    if (tp_sl_mode == "ATR 動態模式")\n        long_sl := close - (atr * atr_sl_mult)\n        long_tp := close + (atr * atr_tp_mult)\n    else\n        long_sl := close - fixed_sl_usd\n        long_tp := close + fixed_tp_usd\n\nif (short_condition)\n    if (tp_sl_mode == "ATR 動態模式")\n        short_sl := close + (atr * atr_sl_mult)\n        short_tp := close - (atr * atr_tp_mult)\n    else\n        short_sl := close + fixed_sl_usd\n        short_tp := close - fixed_tp_usd\n\n// 5. 執行進場與出場\nif (long_condition)\n    strategy.entry("DC_Long", strategy.long)\nif (short_condition)\n    strategy.entry("DC_Short", strategy.short)\n\nif (strategy.position_size > 0)\n    strategy.exit("Exit_Long", "DC_Long", stop=long_sl, limit=long_tp)\nif (strategy.position_size < 0)\n    strategy.exit("Exit_Short", "DC_Short", stop=short_sl, limit=short_tp)`,
+                autoCode: `// DEFINE STRATEGY SETTINGS\nDEFPARAM CumulateOrders = False // 停用加碼，保持單一部位\n\n// 1. 5分鐘黃金優化參數設定\ninitCapital  = 10000     // 自行定義初始資金 (美元)\ndcLength     = 10        // 唐奇安通道週期\ntpSlMode     = 1         // 1 = ATR 動態模式, 2 = 固定值模式\natrLength    = 14        // ATR 週期\natrSlMult    = 2.5       // 5分K止損：2.5 倍 ATR\natrTpMult    = 3.5       // 5分K止盈：3.5 倍 ATR\nfixedSlUsd   = 3.0\nfixedTpUsd   = 9.0\n\n// 2. 指標計算\ndcUpper = Highest[dcLength](High)[1]\ndcLower = Lowest[dcLength](Low)[1]\ndcMid   = (dcUpper + dcLower) / 2\nmyAtr   = AverageTrueRange[atrLength]\n\n// 3. 訊號與執行\nlongCondition  = (close CROSSES OVER dcUpper)\nshortCondition = (close CROSSES UNDER dcLower)\n\nIF tpSlMode = 1 THEN\nslDistance = myAtr * atrSlMult\ntpDistance = myAtr * atrTpMult\nELSE\nslDistance = fixedSlUsd\ntpDistance = fixedTpUsd\nENDIF\n\nmyCapital = StrategyProfit + initCapital\ninvestAmount = myCapital * 0.20\ncalculatedSize = ROUND((investAmount / close) * 100) / 100\npositionSize   = MAX(0.01, calculatedSize)\n\nIF longCondition AND NOT LongOnMarket THEN\nBUY positionSize CONTRACTS AT MARKET\nSET STOP LOSS slDistance\nSET TARGET PROFIT tpDistance\nENDIF\n\nIF shortCondition AND NOT ShortOnMarket THEN\nSELLSHORT positionSize CONTRACTS AT MARKET\nSET STOP LOSS slDistance\nSET TARGET PROFIT tpDistance\nENDIF`
+            },
+            {
+                title: "金字塔",
+                tvCode: `//@version=5\nstrategy("黃金突破 + EMA + 金字塔加倉 (2.5手固定倉位版)", overlay=true, initial_capital=8000, pyramiding=5, default_qty_type=strategy.fixed, default_qty_value=2.5, currency=currency.USD)\n\n// 1. 參數輸入面板\nvar string grp1 = "進場與趨勢過濾"\ndc_length = input.int(10, title="唐奇安通道週期", group=grp1)\nuse_ema   = input.bool(true, title="啟用 EMA 多空排列過濾", group=grp1)\n\nvar string grp2 = "下單與加倉設定"\nbase_qty = input.float(2.5, title="初始進場數量 (手/口)", group=grp2)\nadd_qty  = input.float(0.5, title="每次加碼數量 (手/口)", group=grp2)\nadd_step = input.float(8.0, title="加倉觸發間距 (USD)", group=grp2)\n\nvar string grp3 = "移動停損設定 (Trailing Stop)"\ntrail_dist = input.float(20.0, title="最高/低點回撤平倉距離 (USD)", group=grp3)\n\n// 2. 指標計算\ndc_upper = ta.highest(high, dc_length)[1]\ndc_lower = ta.lowest(low, dc_length)[1]\n\nema20  = ta.ema(close, 20)\nema50  = ta.ema(close, 50)\nema100 = ta.ema(close, 100)\nema200 = ta.ema(close, 200)\n\nis_bullish = (ema20 > ema50) and (ema50 > ema100) and (ema100 > ema200)\nis_bearish = (ema20 < ema50) and (ema50 < ema100) and (ema100 < ema200)\n\nlong_cond  = ta.crossover(close, dc_upper) and (use_ema ? is_bullish : true)\nshort_cond = ta.crossunder(close, dc_lower) and (use_ema ? is_bearish : true)\n\n// 3. 執行進場\nif long_cond and strategy.opentrades == 0\n    strategy.entry("Long_Base", strategy.long, qty=base_qty)`,
+                autoCode: `// 策略名稱：黃金突破 + EMA + 金字塔加倉 (ProOrder 實盤/自動交易版)\n// 本金規劃：$8,000 USD | 初始：2.5手 | 加碼：0.5手\n\nDEFPARAM CumulateOrders = True  // 啟用金字塔加倉機制\n\nDCLength   = 10      // 唐奇安通道週期\nUseEMA     = 1       // 啟用 EMA 過濾\nAddStep    = 8.0     // 加倉觸發間距 (8 USD)\nBaseQty    = 2.5     // 初始手數\nAddQty     = 0.5     // 加碼手數\nTrailDist  = 20.0    // 追蹤停損 (20 USD)\n\nDCCUpper = HIGHEST[DCLength](HIGH)[1]\nDCCLower = LOWEST[DCLength](LOW)[1]\n\nEMA20  = ExponentialAverage[20](CLOSE)\nEMA50  = ExponentialAverage[50](CLOSE)\nEMA100 = ExponentialAverage[100](CLOSE)\nEMA200 = ExponentialAverage[200](CLOSE)\n\nIsBullish = (EMA20 > EMA50) AND (EMA50 > EMA100) AND (EMA100 > EMA200)\nIsBearish = (EMA20 < EMA50) AND (EMA50 < EMA100) AND (EMA100 < EMA200)\n\nLongCond  = (CLOSE CROSSES OVER DCCUpper) AND (UseEMA = 0 OR IsBullish)\nShortCond = (CLOSE CROSSES UNDER DCCLower) AND (UseEMA = 0 OR IsBearish)\n\nIF NOT ONMARKET THEN\nPosHigh = 0\nPosLow = 0\nLastEntryPrice = 0\nENDIF\n\nIF LONGONMARKET THEN\nIF PosHigh = 0 THEN PosHigh = HIGH ELSE PosHigh = MAX(PosHigh, HIGH) ENDIF\nLongStopPrice = PosHigh - TrailDist\nSELL AT LongStopPrice STOP\n\nIF CLOSE >= LastEntryPrice + AddStep THEN\nBUY AddQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nENDIF\nENDIF\n\nIF NOT ONMARKET THEN\nIF LongCond THEN\nBUY BaseQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nPosHigh = HIGH\nELSIF ShortCond THEN\nSELLSHORT BaseQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nPosLow = LOW\nENDIF\nENDIF`
+            }
         ];
 
-        let cards = JSON.parse(localStorage.getItem('my_code_cards')) || initialCards;
-        let todos = JSON.parse(localStorage.getItem('my_todos')) || [];
-        let currentCategory = '全部';
+        let cards = JSON.parse(localStorage.getItem('tv_code_cards')) || defaultCards;
+        let todos = JSON.parse(localStorage.getItem('tv_todos')) || [];
+        let cardTabStates = {}; // 紀錄每張卡片目前看的是 'tv' 還是 'auto'
 
-        // --- 分頁切換邏輯 ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        // --- 程式碼寶庫 logic ---
         function saveCardsToStorage() {
-            localStorage.setItem('my_code_cards', JSON.stringify(cards));
+            localStorage.setItem('tv_code_cards', JSON.stringify(cards));
         }
 
-        function renderCategoryFilters() {
-            const categories = ['全部', ...new Set(cards.map(c => c.category))];
-            const container = document.getElementById('categoryFilters');
-            container.innerHTML = categories.map(cat => 
-                `<button class="filter-btn ${currentCategory === cat ? 'active' : ''}" onclick="setCategory('${cat}')">${cat}</button>`
-            ).join('');
-        }
-
-        function setCategory(cat) {
-            currentCategory = cat;
-            renderCategoryFilters();
+        function setCodeView(cardIndex, type) {
+            cardTabStates[cardIndex] = type;
             renderCards();
         }
 
-        function getTagClass(cat) {
-            if (cat.includes('程式')) return 'tag-green';
-            if (cat.includes('簡報')) return 'tag-orange';
-            return 'tag-blue';
-        }
-
         function renderCards() {
-            const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
             const grid = document.getElementById('cardGrid');
 
-            const filtered = cards.filter(card => {
-                const matchesCat = (currentCategory === '全部' || card.category === currentCategory);
-                const matchesSearch = card.title.toLowerCase().includes(searchKeyword) || 
-                                      card.content.toLowerCase().includes(searchKeyword) ||
-                                      card.category.toLowerCase().includes(searchKeyword);
-                return matchesCat && matchesSearch;
-            });
+            const filtered = cards.filter(c => 
+                c.title.toLowerCase().includes(keyword) || 
+                (c.tvCode && c.tvCode.toLowerCase().includes(keyword)) ||
+                (c.autoCode && c.autoCode.toLowerCase().includes(keyword))
+            );
 
-            document.getElementById('cardCount').innerText = `共 ${filtered.length} 筆結果`;
+            document.getElementById('cardCount').innerText = `共 ${filtered.length} 筆策略`;
 
-            grid.innerHTML = filtered.map((card, index) => {
+            grid.innerHTML = filtered.map((card) => {
                 const realIndex = cards.indexOf(card);
+                const currentView = cardTabStates[realIndex] || 'tv';
+                const codeToShow = currentView === 'tv' ? card.tvCode : card.autoCode;
+
                 return `
                 <div class="card">
                     <div>
                         <div class="card-header">
-                            <span class="card-tag ${getTagClass(card.category)}">${card.category}</span>
-                            <span class="card-no">${card.id || 'No. ' + String(realIndex + 1).padStart(3, '0')}</span>
+                            <span class="card-title">${card.title}</span>
+                            <span style="font-size: 0.8rem; color: #888;">No. ${String(realIndex + 1).padStart(3, '0')}</span>
                         </div>
-                        <div class="card-title">${card.title}</div>
-                        <div class="card-body">${escapeHtml(card.content)}</div>
+                        <div class="code-type-tabs">
+                            <button class="code-type-btn ${currentView === 'tv' ? 'active' : ''}" onclick="setCodeView(${realIndex}, 'tv')">TradingView 程式碼</button>
+                            <button class="code-type-btn ${currentView === 'auto' ? 'active' : ''}" onclick="setCodeView(${realIndex}, 'auto')">自動化程式碼</button>
+                        </div>
+                        <div class="card-body">${escapeHtml(codeToShow || '無程式碼資料')}</div>
                     </div>
                     <div class="card-footer">
-                        <button class="btn-copy" onclick="copyContent(\`${escapeJs(card.content)}\`)">
-                            <i class="fa-regular fa-copy"></i> 複製
+                        <button class="btn-copy" onclick="copyContent(\`${escapeJs(codeToShow)}\`)">
+                            <i class="fa-regular fa-copy"></i> 複製此段程式碼
                         </button>
                         <button class="btn-icon" onclick="openModal(${realIndex})" title="修改">
                             <i class="fa-solid fa-pen-to-square"></i>
@@ -573,44 +511,42 @@
         }
 
         function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
         }
 
         function escapeJs(text) {
-            return text.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\${/g, '\\${');
+            return text ? text.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\${/g, '\\${') : '';
         }
 
         function copyContent(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('已成功複製到剪貼簿！');
+                alert('程式碼已成功複製到剪貼簿！');
             });
         }
 
         function deleteCard(index) {
-            if (confirm('確定要刪除這筆資料嗎？')) {
+            if (confirm('確定要刪除這筆策略嗎？')) {
                 cards.splice(index, 1);
                 saveCardsToStorage();
-                renderCategoryFilters();
                 renderCards();
             }
         }
 
-        // --- Modal 新增/編輯視窗 ---
         function openModal(index = null) {
             const modal = document.getElementById('cardModal');
             modal.style.display = 'flex';
             if (index !== null) {
-                document.getElementById('modalTitle').innerText = '修改資料';
+                document.getElementById('modalTitle').innerText = '修改策略';
                 document.getElementById('editIndex').value = index;
-                document.getElementById('inputCategory').value = cards[index].category;
                 document.getElementById('inputTitle').value = cards[index].title;
-                document.getElementById('inputContent').value = cards[index].content;
+                document.getElementById('inputTvCode').value = cards[index].tvCode || '';
+                document.getElementById('inputAutoCode').value = cards[index].autoCode || '';
             } else {
-                document.getElementById('modalTitle').innerText = '新增資料';
+                document.getElementById('modalTitle').innerText = '新增策略';
                 document.getElementById('editIndex').value = '';
-                document.getElementById('inputCategory').value = '';
                 document.getElementById('inputTitle').value = '';
-                document.getElementById('inputContent').value = '';
+                document.getElementById('inputTvCode').value = '';
+                document.getElementById('inputAutoCode').value = '';
             }
         }
 
@@ -620,35 +556,24 @@
 
         function saveCard() {
             const idx = document.getElementById('editIndex').value;
-            const category = document.getElementById('inputCategory').value.trim() || '未分類';
-            const title = document.getElementById('inputTitle').value.trim() || '無標題';
-            const content = document.getElementById('inputContent').value.trim();
-
-            if (!content) {
-                alert('請輸入內容！');
-                return;
-            }
+            const title = document.getElementById('inputTitle').value.trim() || '未命名策略';
+            const tvCode = document.getElementById('inputTvCode').value.trim();
+            const autoCode = document.getElementById('inputAutoCode').value.trim();
 
             if (idx !== '') {
-                // 修改
-                cards[idx].category = category;
-                cards[idx].title = title;
-                cards[idx].content = content;
+                cards[idx] = { title, tvCode, autoCode };
             } else {
-                // 新增
-                const newId = 'No. ' + String(cards.length + 1).padStart(3, '0');
-                cards.push({ id: newId, category, title, content });
+                cards.push({ title, tvCode, autoCode });
             }
 
             saveCardsToStorage();
             closeModal();
-            renderCategoryFilters();
             renderCards();
         }
 
-        // --- 待辦事項 logic ---
+        // 待辦事項 logic
         function saveTodosToStorage() {
-            localStorage.setItem('my_todos', JSON.stringify(todos));
+            localStorage.setItem('tv_todos', JSON.stringify(todos));
         }
 
         function renderTodos() {
@@ -689,8 +614,7 @@
             renderTodos();
         }
 
-        // 初始化渲染
-        renderCategoryFilters();
+        // 初始化
         renderCards();
         renderTodos();
     </script>
