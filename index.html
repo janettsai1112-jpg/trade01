@@ -339,10 +339,88 @@
             font-weight: bold;
         }
 
+        .todo-layout {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .todo-left {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .date-cards-scroll {
+            overflow-y: auto;
+            max-height: calc(100vh - 260px);
+            padding-right: 6px;
+        }
+
         .date-cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
+        }
+
+        .todo-memo-panel {
+            width: 50%;
+            flex-shrink: 0;
+            position: sticky;
+            top: 20px;
+            background: #fffbea;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+            overflow: hidden;
+        }
+
+        .memo-header {
+            padding: 14px 18px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+        }
+
+        .memo-save-status {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .memo-textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            padding: 18px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            background: transparent;
+            font-family: 'Noto Sans TC', sans-serif;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 900px) {
+            .todo-layout { flex-direction: column; }
+            .todo-memo-panel {
+                width: 100%;
+                position: static;
+                height: 320px;
+            }
+            .date-cards-scroll {
+                max-height: none;
+                overflow-y: visible;
+            }
         }
 
         @media (max-width: 600px) {
@@ -543,19 +621,33 @@
             <p>依日期排列小卡片，每一格內區分為兩人任務</p>
         </div>
 
-        <div class="todo-controls">
-            <div class="todo-add-form">
-                <input type="date" id="todoDateInput">
-                <select id="todoPersonInput">
-                    <option value="A">成員 A (藍色)</option>
-                    <option value="B">成員 B (粉色)</option>
-                </select>
-                <input type="text" id="todoTextInput" placeholder="輸入待辦事項說明..." onkeypress="if(event.key==='Enter') addTodoItem()">
-                <button class="btn-add-todo" onclick="addTodoItem()"><i class="fa-solid fa-plus"></i> 新增任務</button>
+        <div class="todo-layout">
+            <div class="todo-left">
+                <div class="todo-controls">
+                    <div class="todo-add-form">
+                        <input type="date" id="todoDateInput">
+                        <select id="todoPersonInput">
+                            <option value="A">成員 A (藍色)</option>
+                            <option value="B">成員 B (粉色)</option>
+                        </select>
+                        <input type="text" id="todoTextInput" placeholder="輸入待辦事項說明..." onkeypress="if(event.key==='Enter') addTodoItem()">
+                        <button class="btn-add-todo" onclick="addTodoItem()"><i class="fa-solid fa-plus"></i> 新增任務</button>
+                    </div>
+                </div>
+
+                <div class="date-cards-scroll">
+                    <div class="date-cards-grid" id="dateCardsGrid"></div>
+                </div>
+            </div>
+
+            <div class="todo-memo-panel">
+                <div class="memo-header">
+                    <i class="fa-solid fa-note-sticky"></i> 備忘錄
+                    <span class="memo-save-status" id="memoSaveStatus"></span>
+                </div>
+                <textarea id="memoTextarea" class="memo-textarea" placeholder="在這裡輸入想法、備註...&#10;內容會自動儲存"></textarea>
             </div>
         </div>
-
-        <div class="date-cards-grid" id="dateCardsGrid"></div>
     </div>
 
     <!-- ===== 新增/修改策略 Modal ===== -->
@@ -575,10 +667,39 @@
         </div>
     </div>
 
+    <!-- Firebase（用於共用備忘錄即時同步）-->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
     <script>
         // ===== 固定的 Google 試算表來源（不需要使用者手動貼連結）=====
         const SHEET_DOC_ID = '1u4KvOKEwK-fySVfVHKu_jTC3JNyNHWXza6E1pv-4Jbo';
         const SHEET_GID = '68707879';
+
+        // ===== Firebase 共用備忘錄設定（使用 Cloud Firestore） =====
+        // 請至 https://console.firebase.google.com/ 建立專案，
+        // 取得你的 firebaseConfig 後，貼在下面取代預留值。
+        // 在設定完成之前，備忘錄會自動退回「本機模式」（只有自己看得到），不影響其他功能。
+        const firebaseConfig = {
+            apiKey: "AIzaSyArIFrw-dB3DLYCm-fZW622LEiNTCYYOdQ",
+            authDomain: "note-a7eba.firebaseapp.com",
+            projectId: "note-a7eba",
+            storageBucket: "note-a7eba.firebasestorage.app",
+            messagingSenderId: "1094508700118",
+            appId: "1:1094508700118:web:a7901ec88af9d643874477"
+        };
+
+        const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+        let memoDocRef = null;
+
+        if (isFirebaseConfigured) {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                memoDocRef = firebase.firestore().collection('sharedMemo').doc('notes');
+            } catch (e) {
+                console.error('Firebase 初始化失敗', e);
+            }
+        }
 
         // ===== 預設資料（找不到 localStorage 資料時的初始值） =====
         const defaultCards = [
@@ -981,6 +1102,51 @@
             return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
         }
 
+        // ===== 備忘錄（Firebase Firestore 即時共用，未設定時退回本機模式） =====
+        let memoSaveTimer = null;
+
+        function initMemo() {
+            const memoTextarea = document.getElementById('memoTextarea');
+            const statusEl = document.getElementById('memoSaveStatus');
+
+            if (memoDocRef) {
+                statusEl.innerText = '連線中...';
+
+                // 監聽遠端資料變化，任何人打字都會即時同步過來
+                memoDocRef.onSnapshot((doc) => {
+                    const remoteValue = (doc.exists && doc.data().text) ? doc.data().text : '';
+                    // 如果自己正在這個欄位打字中，先不要打斷、覆蓋游標位置
+                    if (document.activeElement !== memoTextarea && memoTextarea.value !== remoteValue) {
+                        memoTextarea.value = remoteValue;
+                    }
+                    statusEl.innerText = '已同步 · ' + formatTimeNow();
+                }, (err) => {
+                    console.error('備忘錄連線失敗', err);
+                    statusEl.innerText = '同步失敗，請檢查 Firebase 設定';
+                });
+
+                memoTextarea.addEventListener('input', () => {
+                    statusEl.innerText = '輸入中...';
+                    clearTimeout(memoSaveTimer);
+                    memoSaveTimer = setTimeout(() => {
+                        memoDocRef.set({ text: memoTextarea.value }, { merge: true });
+                    }, 400);
+                });
+            } else {
+                // 尚未設定 Firebase → 本機模式，只有這台裝置看得到
+                statusEl.innerText = '本機模式（尚未設定共用同步）';
+                memoTextarea.value = localStorage.getItem('tv_memo_notes') || '';
+                memoTextarea.addEventListener('input', () => {
+                    statusEl.innerText = '輸入中...';
+                    clearTimeout(memoSaveTimer);
+                    memoSaveTimer = setTimeout(() => {
+                        localStorage.setItem('tv_memo_notes', memoTextarea.value);
+                        statusEl.innerText = '已儲存（本機）· ' + formatTimeNow();
+                    }, 500);
+                });
+            }
+        }
+
         // ===== 初始化 =====
         document.getElementById('todoDateInput').value = todayStr;
         document.getElementById('autoSyncToggle').checked = autoSyncEnabled;
@@ -988,6 +1154,7 @@
 
         renderCards();
         renderDateCards();
+        initMemo();
         updateSyncStatus('idle', '準備連線...');
         syncFromGoogleSheet(true);
         if (autoSyncEnabled) startAutoSync();
