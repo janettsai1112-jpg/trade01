@@ -3,360 +3,907 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>知識庫檢索系統</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>TradingView 交易策略寶庫 & 雙人日期待辦</title>
+    <!-- FontAwesome 圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        .loader {
-            border-top-color: #3B82F6;
-            -webkit-animation: spinner 1.5s linear infinite;
-            animation: spinner 1.5s linear infinite;
+        :root {
+            --bg-color: #fbf7ee;
+            --card-bg: #ffffff;
+            --primary-color: #2b4c3f;
+            --primary-light: #e8f0eb;
+            --person-a-color: #3b82f6;
+            --person-b-color: #ec4899;
+            --text-main: #333333;
+            --text-muted: #777777;
+            --border-color: #e5dec9;
         }
-        @-webkit-keyframes spinner {
-            0% { -webkit-transform: rotate(0deg); }
-            100% { -webkit-transform: rotate(360deg); }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans TC', sans-serif;
         }
-        @keyframes spinner {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
+
+        /* 導覽列 */
+        .nav-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: #222;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .sheet-sync-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .sheet-sync-bar input {
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            width: 380px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .btn-sync {
+            background-color: #1d6f42;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-sync:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 搜尋列與卡片 */
+        .search-box {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto 25px auto;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px 14px 45px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .add-card-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .code-type-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .code-type-btn {
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .code-type-btn.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .card-body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            height: 250px;
+            overflow: auto;
+            margin-bottom: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.4;
+        }
+
+        .card-footer {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-copy {
+            flex: 1;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-icon {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        /* ===== 雙人日期待辦卡片 ===== */
+        .todo-controls {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .todo-add-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .todo-add-form input, .todo-add-form select {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .todo-add-form input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn-add-todo {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .date-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .date-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .date-card {
+            background-color: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .date-card-header {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 12px 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .date-card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            divide-x: 1px solid var(--border-color);
+            min-height: 180px;
+        }
+
+        .person-column {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .person-column:first-child {
+            border-right: 1px solid var(--border-color);
+            background-color: #fdfbf7;
+        }
+
+        .person-column:last-child {
+            background-color: #ffffff;
+        }
+
+        .person-header {
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .person-a-tag { color: var(--person-a-color); }
+        .person-b-tag { color: var(--person-b-color); }
+
+        .todo-item-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .todo-item-card {
+            background: #f9f9f9;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.88rem;
+        }
+
+        .todo-item-card.completed span {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+
+        .todo-item-card input[type="checkbox"] {
+            margin-top: 3px;
+            cursor: pointer;
+        }
+
+        .todo-item-text {
+            flex: 1;
+            cursor: pointer;
+            word-break: break-all;
+        }
+
+        .btn-del-item {
+            background: none;
+            border: none;
+            color: #e53935;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        .btn-del-item:hover { opacity: 1; }
+
+        /* Modal 彈窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-content input, .modal-content textarea {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        .modal-content textarea {
+            height: 120px;
+            resize: vertical;
+            font-family: monospace;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-cancel { background: #ccc; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .btn-save { background: var(--primary-color); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
+<body>
 
-    <!-- Header / Navbar -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="bg-blue-600 text-white p-2 rounded-lg">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-slate-900">知識庫檢索系統</h1>
-                    <p class="text-xs text-slate-500">自動即時同步 Google 試算表</p>
-                </div>
-            </div>
+    <!-- 頁籤選單 -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('code-tab')"><i class="fa-solid fa-code"></i> 交易程式碼寶庫</button>
+        <button class="tab-btn" onclick="switchTab('todo-tab')"><i class="fa-solid fa-calendar-days"></i> 雙人日期待辦卡牌</button>
+    </div>
+
+    <!-- ===== 分頁一：交易程式碼 ===== -->
+    <div id="code-tab" class="tab-content active">
+        <div class="header">
+            <h1>TradingView 交易策略寶庫</h1>
+            <p>即時查閱 TradingView Pine Script 與自動化交易程式碼</p>
             
-            <div class="flex items-center space-x-2">
-                <button onclick="fetchData()" class="flex items-center text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-3 rounded-md transition-colors">
-                    <svg id="refreshIcon" class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    手動刷新
+            <!-- 發佈至網路同步控制列 -->
+            <div class="sheet-sync-bar">
+                <input type="text" id="csvUrlInput" placeholder="貼上 Google 試算表連結 (或發佈的網址)...">
+                <button class="btn-sync" id="btnSync" onclick="syncFromGoogleSheet()">
+                    <i class="fa-solid fa-rotate"></i> 同步試算表資料
                 </button>
             </div>
         </div>
-    </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-6xl mx-auto px-4 py-6">
-        
-        <!-- Controls: Search and Filters -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row gap-4">
-            <!-- Search Bar -->
-            <div class="relative flex-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <input type="text" id="searchInput" oninput="filterData()" placeholder="搜尋關鍵字（標題、內文、分類...）" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-            </div>
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="搜尋策略名稱或關鍵字..." oninput="renderCards()">
+        </div>
 
-            <!-- Type Filter -->
-            <div class="w-full md:w-48">
-                <select id="typeFilter" onchange="filterData()" class="block w-full py-2 px-3 border border-slate-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                    <option value="">全部類型 (Type)</option>
+        <div class="action-bar">
+            <span style="color: var(--text-muted); font-size: 0.9rem;" id="cardCount">共 0 筆策略</span>
+            <button class="add-card-btn" onclick="openModal()"><i class="fa-solid fa-plus"></i> 新增策略程式碼</button>
+        </div>
+
+        <div class="card-grid" id="cardGrid"></div>
+    </div>
+
+    <!-- ===== 分頁二：雙人日期待辦小卡牌 ===== -->
+    <div id="todo-tab" class="tab-content">
+        <div class="header">
+            <h1>雙人日期待辦小卡牌</h1>
+            <p>依日期排列小卡片，每一格內區分為兩人任務</p>
+        </div>
+
+        <div class="todo-controls">
+            <div class="todo-add-form">
+                <input type="date" id="todoDateInput">
+                <select id="todoPersonInput">
+                    <option value="A">成員 A (藍色)</option>
+                    <option value="B">成員 B (粉色)</option>
                 </select>
-            </div>
-
-            <!-- Category Filter -->
-            <div class="w-full md:w-48">
-                <select id="categoryFilter" onchange="filterData()" class="block w-full py-2 px-3 border border-slate-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                    <option value="">全部分類 (Category)</option>
-                </select>
+                <input type="text" id="todoTextInput" placeholder="輸入待辦事項說明..." onkeypress="if(event.key==='Enter') addTodoItem()">
+                <button class="btn-add-todo" onclick="addTodoItem()"><i class="fa-solid fa-plus"></i> 新增任務</button>
             </div>
         </div>
 
-        <!-- Status & Results Summary -->
-        <div class="flex justify-between items-center mb-4 text-xs text-slate-500 px-1">
-            <span id="statusMessage">資料讀取中...</span>
-            <span id="resultCount"></span>
+        <div class="date-cards-grid" id="dateCardsGrid"></div>
+    </div>
+
+    <!-- ===== 新增/修改策略 Modal ===== -->
+    <div class="modal" id="cardModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">新增策略</h3>
+            <input type="hidden" id="editIndex">
+            <input type="text" id="inputTitle" placeholder="策略標題 (例：唐奇安通道)">
+            <label style="font-size: 0.85rem; color: #555;">TradingView 程式碼 (Pine Script)</label>
+            <textarea id="inputTvCode" placeholder="貼上 TradingView 程式碼..."></textarea>
+            <label style="font-size: 0.85rem; color: #555;">自動化程式碼 (ProOrder / API)</label>
+            <textarea id="inputAutoCode" placeholder="貼上自動化交易程式碼..."></textarea>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-save" onclick="saveCard()">儲存</button>
+            </div>
         </div>
-
-        <!-- Loading Spinner -->
-        <div id="loading" class="flex justify-center items-center py-12">
-            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10"></div>
-        </div>
-
-        <!-- Error Message Container -->
-        <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-6"></div>
-
-        <!-- Results Grid -->
-        <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Cards will be injected here dynamically -->
-        </div>
-
-        <!-- Empty State -->
-        <div id="emptyState" class="hidden text-center py-12 bg-white rounded-xl border border-slate-200">
-            <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <h3 class="mt-2 text-sm font-medium text-slate-900">找不到符合的資料</h3>
-            <p class="mt-1 text-xs text-slate-500">請嘗試調整您的搜尋關鍵字或篩選條件。</p>
-        </div>
-
-    </main>
+    </div>
 
     <script>
-        // =========================================================================
-        // ⚙️ 設定區：請在這裡修改您的 Google 試算表資訊
-        // =========================================================================
-        const SPREADSHEET_ID = '你的Google試算表ID'; // 貼上你的 Google 試算表 ID
-        const GID = '0';                              // 貼上你的工作表 GID（預設第一頁通常是 0）
-        // =========================================================================
+        // 預設策略資料
+        const defaultCards = [
+            {
+                title: "唐奇安通道",
+                tvCode: `//@version=5\nstrategy("黃金唐奇安通道 + EMA 趨勢過濾", overlay=true, initial_capital=10000)\n// (Pine Script 程式碼)`,
+                autoCode: `// DEFINE STRATEGY SETTINGS\nDEFPARAM CumulateOrders = False\n// (自動化程式碼)`
+            },
+            {
+                title: "金字塔",
+                tvCode: `//@version=5\nstrategy("黃金突破 + EMA + 金字塔加倉", overlay=true)\n// (Pine Script 程式碼)`,
+                autoCode: `// ProOrder 金字塔加倉程式碼`
+            }
+        ];
 
-        let allData = [];
-        let filteredData = [];
+        // 預設待辦事項資料
+        const todayStr = new Date().toISOString().split('T')[0];
+        const defaultTodos = [
+            { id: 1, date: todayStr, person: "A", text: "完成唐奇安通道 5分K 參數調校", completed: false },
+            { id: 2, date: todayStr, person: "B", text: "檢查 ProOrder 實盤回測績效報表", completed: true }
+        ];
 
-        // 頁面載入完成後自動執行
-        window.onload = function() {
-            fetchData();
-        };
+        let cards = JSON.parse(localStorage.getItem('tv_code_cards')) || defaultCards;
+        let todos = JSON.parse(localStorage.getItem('tv_todos_v2')) || defaultTodos;
+        let cardTabStates = {};
 
-        // 從 Google GViz API 抓取 JSON 資料
-        function fetchData() {
-            showLoading(true);
-            hideError();
-
-            const refreshIcon = document.getElementById('refreshIcon');
-            refreshIcon.classList.add('animate-spin');
-
-            // 建立 GViz API 請求 URL
-            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
-
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('無法存取 Google 試算表，請確認分享權限是否已開啟。');
-                    }
-                    return response.text();
-                })
-                .then(text => {
-                    // GViz 返回的格式為 google.visualization.Query.setResponse({...});
-                    // 需要將前後的 JS 函式包裹字串裁切掉，轉為純 JSON 格式
-                    const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-                    const data = JSON.parse(jsonString);
-                    
-                    parseGoogleSheetsData(data);
-                    showLoading(false);
-                    refreshIcon.classList.remove('animate-spin');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showError('讀取資料失敗：' + error.message + '。請確保試算表已開啟「知道連結的人即可檢視」權限。');
-                    showLoading(false);
-                    refreshIcon.classList.remove('animate-spin');
-                });
+        // 載入上次儲存的 試算表 連結
+        const savedSheetUrl = localStorage.getItem('tv_sheet_url');
+        if (savedSheetUrl) {
+            document.getElementById('csvUrlInput').value = savedSheetUrl;
         }
 
-        // 解析 GViz JSON 物件
-        function parseGoogleSheetsData(gvizData) {
-            const table = gvizData.table;
-            if (!table || !table.rows || table.rows.length === 0) {
-                showError('試算表中沒有找到任何資料。');
+        document.getElementById('todoDateInput').value = todayStr;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // ===== 使用 GViz API 自動擷取與解析 Google 試算表 =====
+        async function syncFromGoogleSheet() {
+            const rawUrl = document.getElementById('csvUrlInput').value.trim();
+            if (!rawUrl) {
+                alert('請先貼上 Google 試算表連結！');
                 return;
             }
 
-            // 取得表頭欄位名稱
-            const headers = table.cols.map(col => col ? (col.label || '').trim() : '');
+            const btnSync = document.getElementById('btnSync');
+            btnSync.disabled = true;
+            btnSync.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 同步中...`;
+
+            try {
+                // 自動提煉 Sheet ID 與 gid
+                const docIdMatch = rawUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                if (!docIdMatch) {
+                    throw new Error('無法識別 Google 試算表 ID，請確認連結格式！');
+                }
+                const docId = docIdMatch[1];
+
+                const gidMatch = rawUrl.match(/[?&]gid=([0-9]+)/);
+                const gid = gidMatch ? gidMatch[1] : '0';
+
+                // 構建 GViz API URL
+                const gvizUrl = `https://docs.google.com/spreadsheets/d/${docId}/gviz/tq?tqx=out:json&gid=${gid}`;
+
+                const response = await fetch(gvizUrl);
+                const text = await response.text();
+
+                // 解析 GViz JSON (裁切掉前面與後面的 JS 包裝碼)
+                const jsonStart = text.indexOf('{');
+                const jsonEnd = text.lastIndexOf('}') + 1;
+                if (jsonStart === -1 || jsonEnd === -1) {
+                    throw new Error('試算表無法讀取，請確認已設定為「知道連結的人皆可查看」！');
+                }
+
+                const jsonString = text.substring(jsonStart, jsonEnd);
+                const data = JSON.parse(jsonString);
+
+                parseGvizDataToCards(data);
+
+                // 儲存成功的 URL 方便下次使用
+                localStorage.setItem('tv_sheet_url', rawUrl);
+                alert('成功同步 Google 試算表策略資料！');
+            } catch (err) {
+                alert('同步失敗：' + err.message);
+                console.error(err);
+            } finally {
+                btnSync.disabled = false;
+                btnSync.innerHTML = `<i class="fa-solid fa-rotate"></i> 同步試算表資料`;
+            }
+        }
+
+        function parseGvizDataToCards(data) {
+            const table = data.table;
+            if (!table || !table.rows || table.rows.length === 0) return;
+
+            const newCards = [];
             
-            // 欄位名稱對應智慧判斷 (對應 Type, 分類, 標題, 內容)
-            let typeIdx = headers.findIndex(h => /type|類型/i.test(h));
-            let categoryIdx = headers.findIndex(h => /category|分類/i.test(h));
-            let titleIdx = headers.findIndex(h => /title|標題/i.test(h));
-            let contentIdx = headers.findIndex(h => /content|內容|描述|說明/i.test(h));
+            // 判斷是否有標題列（第 0 列）
+            let startIndex = 0;
+            const firstRowCells = table.rows[0].c;
+            if (firstRowCells && firstRowCells[0] && firstRowCells[0].v) {
+                const firstVal = String(firstRowCells[0].v).toLowerCase();
+                if (firstVal.includes('標題') || firstVal.includes('title') || firstVal.includes('名稱') || firstVal.includes('策略')) {
+                    startIndex = 1; // 跳過標題列
+                }
+            }
 
-            // 如果沒有抓到對應的欄位表頭，退回預設索引位置
-            if (typeIdx === -1) typeIdx = 0;
-            if (categoryIdx === -1) categoryIdx = 1;
-            if (titleIdx === -1) titleIdx = 2;
-            if (contentIdx === -1) contentIdx = 3;
+            for (let i = startIndex; i < table.rows.length; i++) {
+                const cells = table.rows[i].c;
+                if (!cells) continue;
 
-            allData = [];
+                const title = cells[0] && cells[0].v ? String(cells[0].v).trim() : '';
+                const tvCode = cells[1] && cells[1].v ? String(cells[1].v).trim() : '';
+                const autoCode = cells[2] && cells[2].v ? String(cells[2].v).trim() : '';
 
-            // 逐列解析資料
-            table.rows.forEach((row, index) => {
-                const c = row.c;
-                if (!c) return;
-
-                const getValue = (idx) => {
-                    if (idx < 0 || idx >= c.length || !c[idx]) return '';
-                    // c[idx].v 為原始值，c[idx].f 為格式化後的顯示文字
-                    return (c[idx].f !== undefined && c[idx].f !== null) ? c[idx].f : (c[idx].v !== null ? c[idx].v : '');
-                };
-
-                const typeVal = String(getValue(typeIdx)).trim();
-                const categoryVal = String(getValue(categoryIdx)).trim();
-                const titleVal = String(getValue(titleIdx)).trim();
-                const contentVal = String(getValue(contentIdx)).trim();
-
-                // 排除空白資料列
-                if (typeVal || categoryVal || titleVal || contentVal) {
-                    allData.push({
-                        id: index,
-                        type: typeVal || '未分類',
-                        category: categoryVal || '通用',
-                        title: titleVal || '無標題',
-                        content: contentVal || ''
+                if (title || tvCode || autoCode) {
+                    newCards.push({
+                        title: title || '未命名策略',
+                        tvCode: tvCode,
+                        autoCode: autoCode
                     });
                 }
-            });
+            }
 
-            // 更新篩選下拉選單選項
-            populateSelectOptions();
-
-            // 執行第一次篩選與渲染
-            filterData();
-
-            // 更新時間顯示
-            const now = new Date();
-            document.getElementById('statusMessage').textContent = `最後同步時間：${now.toLocaleTimeString()}`;
-        }
-
-        // 動態產生下拉選單選項
-        function populateSelectOptions() {
-            const typeSelect = document.getElementById('typeFilter');
-            const categorySelect = document.getElementById('categoryFilter');
-
-            const currentType = typeSelect.value;
-            const currentCategory = categorySelect.value;
-
-            // 收集所有不重複的 Type 與 Category
-            const types = [...new Set(allData.map(item => item.type))].filter(Boolean);
-            const categories = [...new Set(allData.map(item => item.category))].filter(Boolean);
-
-            typeSelect.innerHTML = '<option value="">全部類型 (Type)</option>';
-            types.forEach(t => {
-                typeSelect.innerHTML += `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`;
-            });
-
-            categorySelect.innerHTML = '<option value="">全部分類 (Category)</option>';
-            categories.forEach(c => {
-                categorySelect.innerHTML += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`;
-            });
-
-            typeSelect.value = currentType;
-            categorySelect.value = currentCategory;
-        }
-
-        // 搜尋與篩選主邏輯
-        function filterData() {
-            const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
-            const selectedType = document.getElementById('typeFilter').value;
-            const selectedCategory = document.getElementById('categoryFilter').value;
-
-            filteredData = allData.filter(item => {
-                const matchesSearch = !searchValue || 
-                    item.title.toLowerCase().includes(searchValue) || 
-                    item.content.toLowerCase().includes(searchValue) ||
-                    item.type.toLowerCase().includes(searchValue) ||
-                    item.category.toLowerCase().includes(searchValue);
-
-                const matchesType = !selectedType || item.type === selectedType;
-                const matchesCategory = !selectedCategory || item.category === selectedCategory;
-
-                return matchesSearch && matchesType && matchesCategory;
-            });
-
-            renderGrid();
-        }
-
-        // 渲染卡片結果至畫面上
-        function renderGrid() {
-            const grid = document.getElementById('resultsGrid');
-            const emptyState = document.getElementById('emptyState');
-            const resultCount = document.getElementById('resultCount');
-
-            grid.innerHTML = '';
-            resultCount.textContent = `共計 ${filteredData.length} 筆資料`;
-
-            if (filteredData.length === 0) {
-                emptyState.classList.remove('hidden');
+            if (newCards.length > 0) {
+                cards = newCards;
+                localStorage.setItem('tv_code_cards', JSON.stringify(cards));
+                renderCards();
             } else {
-                emptyState.classList.add('hidden');
-                
-                filteredData.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow flex flex-col justify-between';
-                    
-                    // 根據內文是否包含網址自動轉換為超連結，並支援換行顯示
-                    const formattedContent = formatContent(item.content);
+                alert('沒有在試算表中讀取到有效資料！');
+            }
+        }
 
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex items-center space-x-2 mb-2">
-                                <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-100">
-                                    ${escapeHtml(item.type)}
-                                </span>
-                                <span class="bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5 rounded">
-                                    ${escapeHtml(item.category)}
-                                </span>
-                            </div>
-                            <h3 class="text-base font-bold text-slate-900 mb-2 leading-snug">
-                                ${escapeHtml(item.title)}
-                            </h3>
-                            <div class="text-slate-600 text-sm whitespace-pre-line leading-relaxed">
-                                ${formattedContent}
-                            </div>
+        // ===== 卡片渲染邏輯 =====
+        function renderCards() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const grid = document.getElementById('cardGrid');
+
+            const filtered = cards.filter(c => 
+                c.title.toLowerCase().includes(keyword) || 
+                (c.tvCode && c.tvCode.toLowerCase().includes(keyword)) ||
+                (c.autoCode && c.autoCode.toLowerCase().includes(keyword))
+            );
+
+            document.getElementById('cardCount').innerText = `共 ${filtered.length} 筆策略`;
+
+            grid.innerHTML = filtered.map((card) => {
+                const realIndex = cards.indexOf(card);
+                const currentView = cardTabStates[realIndex] || 'tv';
+                const codeToShow = currentView === 'tv' ? card.tvCode : card.autoCode;
+
+                return `
+                <div class="card">
+                    <div>
+                        <div class="card-header">
+                            <span class="card-title">${escapeHtml(card.title)}</span>
+                            <span style="font-size: 0.8rem; color: #888;">No. ${String(realIndex + 1).padStart(3, '0')}</span>
                         </div>
-                    `;
-                    grid.appendChild(card);
-                });
+                        <div class="code-type-tabs">
+                            <button class="code-type-btn ${currentView === 'tv' ? 'active' : ''}" onclick="setCodeView(${realIndex}, 'tv')">TradingView 程式碼</button>
+                            <button class="code-type-btn ${currentView === 'auto' ? 'active' : ''}" onclick="setCodeView(${realIndex}, 'auto')">自動化程式碼</button>
+                        </div>
+                        <div class="card-body">${escapeHtml(codeToShow || '無程式碼資料')}</div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn-copy" onclick="copyByIndex(${realIndex}, '${currentView}')">
+                            <i class="fa-regular fa-copy"></i> 複製程式碼
+                        </button>
+                        <button class="btn-icon" onclick="openModal(${realIndex})"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-icon" onclick="deleteCard(${realIndex})"><i class="fa-solid fa-trash" style="color: #e53935;"></i></button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function setCodeView(cardIndex, type) {
+            cardTabStates[cardIndex] = type;
+            renderCards();
+        }
+
+        function copyByIndex(realIndex, currentView) {
+            const card = cards[realIndex];
+            const textToCopy = currentView === 'tv' ? card.tvCode : card.autoCode;
+            if (!textToCopy) {
+                alert('目前無可複製的程式碼！');
+                return;
+            }
+            navigator.clipboard.writeText(textToCopy).then(() => alert('程式碼已成功複製！'));
+        }
+
+        function deleteCard(index) {
+            if (confirm('確定要刪除這筆策略嗎？')) {
+                cards.splice(index, 1);
+                localStorage.setItem('tv_code_cards', JSON.stringify(cards));
+                renderCards();
             }
         }
 
-        // 格式化內文：轉換網址為可點擊連結
-        function formatContent(text) {
-            if (!text) return '';
-            const escaped = escapeHtml(text);
-            // 偵測 HTTP/HTTPS 網址並轉為 <a> 標籤
-            const urlPattern = /(https?:\/\/[^\s]+)/g;
-            return escaped.replace(urlPattern, url => {
-                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all inline-flex items-center">
-                    ${url}
-                    <svg class="w-3 h-3 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                </a>`;
-            });
-        }
-
-        // XSS 安全防護：轉義 HTML 特殊字元
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // 顯示 / 隱藏 Loading 載入動畫
-        function showLoading(show) {
-            const loading = document.getElementById('loading');
-            if (show) {
-                loading.classList.remove('hidden');
-                document.getElementById('resultsGrid').innerHTML = '';
-                document.getElementById('emptyState').classList.add('hidden');
+        function openModal(index = null) {
+            document.getElementById('cardModal').style.display = 'flex';
+            if (index !== null) {
+                document.getElementById('modalTitle').innerText = '修改策略';
+                document.getElementById('editIndex').value = index;
+                document.getElementById('inputTitle').value = cards[index].title;
+                document.getElementById('inputTvCode').value = cards[index].tvCode || '';
+                document.getElementById('inputAutoCode').value = cards[index].autoCode || '';
             } else {
-                loading.classList.add('hidden');
+                document.getElementById('modalTitle').innerText = '新增策略';
+                document.getElementById('editIndex').value = '';
+                document.getElementById('inputTitle').value = '';
+                document.getElementById('inputTvCode').value = '';
+                document.getElementById('inputAutoCode').value = '';
             }
         }
 
-        // 顯示錯誤訊息
-        function showError(msg) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = msg;
-            errorDiv.classList.remove('hidden');
+        function closeModal() {
+            document.getElementById('cardModal').style.display = 'none';
         }
 
-        // 隱藏錯誤訊息
-        function hideError() {
-            document.getElementById('errorMessage').classList.add('hidden');
+        function saveCard() {
+            const idx = document.getElementById('editIndex').value;
+            const title = document.getElementById('inputTitle').value.trim() || '未命名策略';
+            const tvCode = document.getElementById('inputTvCode').value.trim();
+            const autoCode = document.getElementById('inputAutoCode').value.trim();
+
+            if (idx !== '') cards[idx] = { title, tvCode, autoCode };
+            else cards.push({ title, tvCode, autoCode });
+
+            localStorage.setItem('tv_code_cards', JSON.stringify(cards));
+            closeModal();
+            renderCards();
         }
+
+        // ===== 雙人日期待辦卡牌邏輯 =====
+        function renderDateCards() {
+            const grid = document.getElementById('dateCardsGrid');
+            
+            const groupedByDate = {};
+            todos.forEach(t => {
+                if (!groupedByDate[t.date]) groupedByDate[t.date] = [];
+                groupedByDate[t.date].push(t);
+            });
+
+            const sortedDates = Object.keys(groupedByDate).sort().reverse();
+
+            if (sortedDates.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">目前尚無任何日期待辦卡片，請於上方新增！</div>`;
+                return;
+            }
+
+            grid.innerHTML = sortedDates.map(date => {
+                const dateItems = groupedByDate[date];
+                const itemsA = dateItems.filter(i => i.person === 'A');
+                const itemsB = dateItems.filter(i => i.person === 'B');
+
+                return `
+                <div class="date-card">
+                    <div class="date-card-header">
+                        <span><i class="fa-regular fa-calendar"></i> ${date}</span>
+                        <button style="background:none; border:none; color:#fff; cursor:pointer;" onclick="deleteDateCard('${date}')" title="刪除整個日期">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="date-card-body">
+                        <!-- 左側：成員 A -->
+                        <div class="person-column">
+                            <div class="person-header person-a-tag">
+                                <i class="fa-solid fa-user"></i> 成員 A
+                            </div>
+                            <ul class="todo-item-list">
+                                ${renderTodoListItems(itemsA)}
+                            </ul>
+                        </div>
+                        <!-- 右側：成員 B -->
+                        <div class="person-column">
+                            <div class="person-header person-b-tag">
+                                <i class="fa-solid fa-user-check"></i> 成員 B
+                            </div>
+                            <ul class="todo-item-list">
+                                ${renderTodoListItems(itemsB)}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function renderTodoListItems(itemList) {
+            if (itemList.length === 0) {
+                return `<li style="font-size: 0.8rem; color: #bbb; text-align: center; padding: 10px;">無任務</li>`;
+            }
+            return itemList.map(item => `
+                <li class="todo-item-card ${item.completed ? 'completed' : ''}">
+                    <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleTodoItem(${item.id})">
+                    <span class="todo-item-text" onclick="toggleTodoItem(${item.id})">${escapeHtml(item.text)}</span>
+                    <button class="btn-del-item" onclick="deleteTodoItem(${item.id})"><i class="fa-solid fa-xmark"></i></button>
+                </li>
+            `).join('');
+        }
+
+        function addTodoItem() {
+            const date = document.getElementById('todoDateInput').value;
+            const person = document.getElementById('todoPersonInput').value;
+            const textInput = document.getElementById('todoTextInput');
+            const text = textInput.value.trim();
+
+            if (!date) { alert('請選擇日期！'); return; }
+            if (!text) { alert('請輸入任務內容！'); return; }
+
+            todos.push({
+                id: Date.now(),
+                date: date,
+                person: person,
+                text: text,
+                completed: false
+            });
+
+            localStorage.setItem('tv_todos_v2', JSON.stringify(todos));
+            textInput.value = '';
+            renderDateCards();
+        }
+
+        function toggleTodoItem(id) {
+            const item = todos.find(t => t.id === id);
+            if (item) {
+                item.completed = !item.completed;
+                localStorage.setItem('tv_todos_v2', JSON.stringify(todos));
+                renderDateCards();
+            }
+        }
+
+        function deleteTodoItem(id) {
+            todos = todos.filter(t => t.id !== id);
+            localStorage.setItem('tv_todos_v2', JSON.stringify(todos));
+            renderDateCards();
+        }
+
+        function deleteDateCard(date) {
+            if (confirm(`確定要刪除 ${date} 所有待辦任務嗎？`)) {
+                todos = todos.filter(t => t.date !== date);
+                localStorage.setItem('tv_todos_v2', JSON.stringify(todos));
+                renderDateCards();
+            }
+        }
+
+        function escapeHtml(text) {
+            return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+        }
+
+        // 初始化
+        renderCards();
+        renderDateCards();
     </script>
 </body>
 </html>
