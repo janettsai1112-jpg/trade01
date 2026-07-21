@@ -3,619 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingView 交易策略寶庫 & 待辦事項</title>
-    <!-- FontAwesome 圖示 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>知識庫檢索系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-color: #fbf7ee;
-            --card-bg: #ffffff;
-            --primary-color: #2b4c3f;
-            --text-main: #333333;
-            --text-muted: #777777;
-            --border-color: #e5dec9;
+        .loader {
+            border-top-color: #3B82F6;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Noto Sans TC', sans-serif;
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        /* 導覽列 */
-        .nav-tabs {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .tab-btn {
-            background-color: transparent;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 10px 24px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active, .tab-btn:hover {
-            background-color: var(--primary-color);
-            color: #fff;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            color: #222;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .sheet-link-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 15px;
-            background-color: #fff;
-            border: 1px solid var(--border-color);
-            padding: 8px 18px;
-            border-radius: 20px;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        }
-
-        .sheet-link-btn:hover {
-            background-color: #f0ebd9;
-        }
-
-        .tab-content {
-            display: none;
-            width: 100%;
-            max-width: 1100px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* 搜尋列 */
-        .search-box {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto 25px auto;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 14px 20px 14px 45px;
-            border-radius: 30px;
-            border: 1px solid var(--border-color);
-            outline: none;
-            font-size: 1rem;
-            background: #fff;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-        }
-
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .add-card-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        /* 卡片網格 */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-            gap: 20px;
-        }
-
-        @media (max-width: 600px) {
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #222;
-        }
-
-        /* 切換 TV / 自動化頁籤 */
-        .code-type-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .code-type-btn {
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            border: 1px solid var(--border-color);
-            background: #fff;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .code-type-btn.active {
-            background: var(--primary-color);
-            color: #fff;
-            border-color: var(--primary-color);
-        }
-
-        .card-body {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 0.85rem;
-            white-space: pre;
-            height: 250px;
-            overflow: auto;
-            margin-bottom: 15px;
-            font-family: 'Courier New', Courier, monospace;
-            line-height: 1.4;
-        }
-
-        .card-footer {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .btn-copy {
-            flex: 1;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .btn-icon {
-            background-color: #fff;
-            border: 1px solid var(--border-color);
-            padding: 10px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #555;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-icon:hover {
-            background-color: #f0e6d2;
-        }
-
-        /* 待辦事項頁面 */
-        .todo-container {
-            background-color: #fff;
-            border-radius: 16px;
-            padding: 25px;
-            border: 1px solid var(--border-color);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .todo-input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .todo-input-group input {
-            flex: 1;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            outline: none;
-        }
-
-        .todo-input-group button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .todo-list {
-            list-style: none;
-        }
-
-        .todo-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 10px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .todo-item.completed span {
-            text-decoration: line-through;
-            color: #aaa;
-        }
-
-        .todo-item-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .delete-todo-btn {
-            background: none;
-            border: none;
-            color: #e53935;
-            cursor: pointer;
-        }
-
-        /* Modal 彈窗 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: #fff;
-            padding: 25px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .modal-content input, .modal-content textarea {
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            outline: none;
-        }
-
-        .modal-content textarea {
-            height: 120px;
-            resize: vertical;
-            font-family: monospace;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .btn-cancel { background: #ccc; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-        .btn-save { background: var(--primary-color); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
 
-    <!-- 頁籤選單 -->
-    <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('code-tab')"><i class="fa-solid fa-code"></i> 交易程式碼寶庫</button>
-        <button class="tab-btn" onclick="switchTab('todo-tab')"><i class="fa-solid fa-list-check"></i> 待辦事項</button>
-    </div>
-
-    <!-- ===== 分頁一：交易程式碼 ===== -->
-    <div id="code-tab" class="tab-content active">
-        <div class="header">
-            <h1>TradingView 交易策略寶庫</h1>
-            <p>即時查閱 TradingView Pine Script 與自動化交易程式碼</p>
-            <a href="https://docs.google.com/spreadsheets/d/1u4KvOKEwK-fySVfVHKu_jTC3JNyNHWXza6E1pv-4Jbo/edit?gid=68707879#gid=68707879" target="_blank" class="sheet-link-btn">
-                <i class="fa-solid fa-file-excel" style="color: #1d6f42;"></i> 開啟原始資料 Google Sheet
-            </a>
-        </div>
-
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" placeholder="搜尋策略名稱或關鍵字..." oninput="renderCards()">
-        </div>
-
-        <div class="action-bar">
-            <span style="color: var(--text-muted); font-size: 0.9rem;" id="cardCount">共 0 筆策略</span>
-            <button class="add-card-btn" onclick="openModal()"><i class="fa-solid fa-plus"></i> 新增策略程式碼</button>
-        </div>
-
-        <div class="card-grid" id="cardGrid"></div>
-    </div>
-
-    <!-- ===== 分頁二：待辦事項 ===== -->
-    <div id="todo-tab" class="tab-content">
-        <div class="header">
-            <h1>待辦事項管理</h1>
-            <p>記錄策略優化、參數調校與待辦任務</p>
-        </div>
-        <div class="todo-container">
-            <div class="todo-input-group">
-                <input type="text" id="todoInput" placeholder="請輸入待辦事項..." onkeypress="if(event.key==='Enter') addTodo()">
-                <button onclick="addTodo()"><i class="fa-solid fa-plus"></i> 新增</button>
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white p-2 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">知識庫檢索系統</h1>
+                    <p class="text-xs text-slate-500">自動即時同步 Google 試算表</p>
+                </div>
             </div>
-            <ul class="todo-list" id="todoList"></ul>
-        </div>
-    </div>
-
-    <!-- ===== 新增/修改 Modal ===== -->
-    <div class="modal" id="cardModal">
-        <div class="modal-content">
-            <h3 id="modalTitle">新增策略</h3>
-            <input type="hidden" id="editIndex">
-            <input type="text" id="inputTitle" placeholder="策略標題 (例：唐奇安通道)">
-            <label style="font-size: 0.85rem; color: #555;">TradingView 程式碼 (Pine Script)</label>
-            <textarea id="inputTvCode" placeholder="貼上 TradingView 程式碼..."></textarea>
-            <label style="font-size: 0.85rem; color: #555;">自動化程式碼 (ProOrder / API)</label>
-            <textarea id="inputAutoCode" placeholder="貼上自動化交易程式碼..."></textarea>
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">取消</button>
-                <button class="btn-save" onclick="saveCard()">儲存</button>
+            
+            <div class="flex items-center space-x-2">
+                <button onclick="fetchData()" class="flex items-center text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-3 rounded-md transition-colors">
+                    <svg id="refreshIcon" class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    手動刷新
+                </button>
             </div>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto px-4 py-6">
+        
+        <!-- Controls: Search and Filters -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row gap-4">
+            <!-- Search Bar -->
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <input type="text" id="searchInput" oninput="filterData()" placeholder="搜尋關鍵字（標題、內文、分類...）" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            </div>
+
+            <!-- Type Filter -->
+            <div class="w-full md:w-48">
+                <select id="typeFilter" onchange="filterData()" class="block w-full py-2 px-3 border border-slate-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <option value="">全部類型 (Type)</option>
+                </select>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="w-full md:w-48">
+                <select id="categoryFilter" onchange="filterData()" class="block w-full py-2 px-3 border border-slate-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <option value="">全部分類 (Category)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Status & Results Summary -->
+        <div class="flex justify-between items-center mb-4 text-xs text-slate-500 px-1">
+            <span id="statusMessage">資料讀取中...</span>
+            <span id="resultCount"></span>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="flex justify-center items-center py-12">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10"></div>
+        </div>
+
+        <!-- Error Message Container -->
+        <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-6"></div>
+
+        <!-- Results Grid -->
+        <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Cards will be injected here dynamically -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12 bg-white rounded-xl border border-slate-200">
+            <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h3 class="mt-2 text-sm font-medium text-slate-900">找不到符合的資料</h3>
+            <p class="mt-1 text-xs text-slate-500">請嘗試調整您的搜尋關鍵字或篩選條件。</p>
+        </div>
+
+    </main>
 
     <script>
-        const defaultCards = [
-            {
-                title: "唐奇安通道",
-                tvCode: `//@version=5\nstrategy("黃金唐奇安通道 + EMA 趨勢過濾", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=20, currency=currency.USD)\n\n// ==========================================\n// 1. 參數輸入面板 (Inputs)\n// ==========================================\ndc_length = input.int(10, title="唐奇安通道週期 (K線數量)", group="唐奇安通道參數")\nuse_ema_filter = input.bool(true, title="啟用 EMA 多空排列過濾", group="EMA 趨勢過濾")\n\ntp_sl_mode = input.string("ATR 動態模式", title="風控模式選擇", options=["ATR 動態模式", "固定美元模式"], group="風控機制設定")\n\natr_length  = input.int(14, title="ATR 週期", group="模式 A: ATR 參數")\natr_sl_mult = input.float(2.0, title="ATR 止損倍數", step=0.1, group="模式 A: ATR 參數")\natr_tp_mult = input.float(6.0, title="ATR 止盈倍數", step=0.1, group="模式 A: ATR 參數")\n\nfixed_sl_usd = input.float(8.0, title="固定止損美元", group="模式 B: 固定美元參數")\nfixed_tp_usd = input.float(24.0, title="固定止盈美元", group="模式 B: 固定美元參數")\n\n// ==========================================\n// 2. 技術指標計算 (Indicators)\n// ==========================================\ndc_upper = ta.highest(high, dc_length)[1]\ndc_lower = ta.lowest(low, dc_length)[1]\ndc_mid   = (dc_upper + dc_lower) / 2\natr = ta.atr(atr_length)\n\n// EMA 均線系統 (20, 50, 100, 200)\nema20  = ta.ema(close, 20)\nema50  = ta.ema(close, 50)\nema100 = ta.ema(close, 100)\nema200 = ta.ema(close, 200)\n\nplot(ema20,  color=color.new(color.green, 50),  title="EMA 20")\nplot(ema50,  color=color.new(color.blue, 50),   title="EMA 50")\nplot(ema100, color=color.new(color.orange, 50), title="EMA 100")\nplot(ema200, color=color.new(color.red, 50),    title="EMA 200", linewidth=2)\n\n// ==========================================\n// 3. 核心交易訊號與 EMA 濾網 (Signals)\n// ==========================================\nis_bullish_ema = (ema20 > ema50) and (ema50 > ema100) and (ema100 > ema200)\nis_bearish_ema = (ema20 < ema50) and (ema50 < ema100) and (ema100 < ema200)\n\nlong_filter  = use_ema_filter ? is_bullish_ema : true\nshort_filter = use_ema_filter ? is_bearish_ema : true\n\nlong_condition  = ta.crossover(close, dc_upper) and long_filter\nshort_condition = ta.crossunder(close, dc_lower) and short_filter\n\n// ==========================================\n// 4. 記憶進場時的止損止盈價格 (SL/TP Pricing)\n// ==========================================\nvar float long_sl = na\nvar float long_tp = na\nvar float short_sl = na\nvar float short_tp = na\n\nif (long_condition)\n    if (tp_sl_mode == "ATR 動態模式")\n        long_sl := close - (atr * atr_sl_mult)\n        long_tp := close + (atr * atr_tp_mult)\n    else\n        long_sl := close - fixed_sl_usd\n        long_tp := close + fixed_tp_usd\n\nif (short_condition)\n    if (tp_sl_mode == "ATR 動態模式")\n        short_sl := close + (atr * atr_sl_mult)\n        short_tp := close - (atr * atr_tp_mult)\n    else\n        short_sl := close + fixed_sl_usd\n        short_tp := close - fixed_tp_usd\n\n// ==========================================\n// 5. 執行進場與智慧出場基準 (Execution)\n// ==========================================\nif (long_condition)\n    strategy.entry("DC_Long", strategy.long)\n\nif (short_condition)\n    strategy.entry("DC_Short", strategy.short)\n\nif (strategy.position_size > 0)\n    strategy.exit("Exit_Long", "DC_Long", stop=long_sl, limit=long_tp)\n\nif (strategy.position_size < 0)\n    strategy.exit("Exit_Short", "DC_Short", stop=short_sl, limit=short_tp)\n\n// ==========================================\n// 6. 圖表視覺化呈現 (Visuals)\n// ==========================================\nplot(dc_upper, title="通道上軌 (壓力)", color=color.new(color.blue, 40), linewidth=1)\nplot(dc_lower, title="通道下軌 (支撐)", color=color.new(color.blue, 40), linewidth=1)\nplot(dc_mid, title="通道中線", color=color.new(color.gray, 70), style=plot.style_line)\n\nplotshape(long_condition, title="突破做多", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)\nplotshape(short_condition, title="跌破做空", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)`,
-                autoCode: `// DEFINE STRATEGY SETTINGS\nDEFPARAM CumulateOrders = False // 停用加碼，保持單一部位\n\n// ==========================================\n// 1. 5分鐘黃金優化參數設定\n// ==========================================\ninitCapital  = 10000     // 自行定義初始資金 (美元)\ndcLength     = 10        // 唐奇安通道週期\ntpSlMode     = 1         // 1 = ATR 動態模式, 2 = 固定值模式\natrLength    = 14        // ATR 週期\natrSlMult    = 2.5       // 5分K止損：2.5 倍 ATR\natrTpMult    = 3.5       // 5分K止盈：3.5 倍 ATR\nfixedSlUsd   = 3.0\nfixedTpUsd   = 9.0\n\n// ==========================================\n// 2. 技術指標計算 (Indicators)\n// ==========================================\ndcUpper = Highest[dcLength](High)[1]   // [1] = 取前一根K棒為止的通道高點，避免自我參照\ndcLower = Lowest[dcLength](Low)[1]     // [1] = 取前一根K棒為止的通道低點，避免自我參照\ndcMid   = (dcUpper + dcLower) / 2\nmyAtr   = AverageTrueRange[atrLength]\n\n// ==========================================\n// 3. 核心交易訊號（測試版：暫時移除 EMA 濾網與時間濾網）\n// ==========================================\nlongCondition  = (close CROSSES OVER dcUpper)\nshortCondition = (close CROSSES UNDER dcLower)\n\n// ==========================================\n// 4. 計算止損與止盈距離 (Distance Points/Price)\n// ==========================================\nIF tpSlMode = 1 THEN\nslDistance = myAtr * atrSlMult\ntpDistance = myAtr * atrTpMult\nELSE\nslDistance = fixedSlUsd\ntpDistance = fixedTpUsd\nENDIF\n\n// ==========================================\n// 5. 執行進場與止損止盈設定 (Execution)\n// ==========================================\nmyCapital = StrategyProfit + initCapital\ninvestAmount = myCapital * 0.20\ncalculatedSize = ROUND((investAmount / close) * 100) / 100\npositionSize   = MAX(0.01, calculatedSize)\n\n// 做多進場\nIF longCondition AND NOT LongOnMarket THEN\nBUY positionSize CONTRACTS AT MARKET\nSET STOP LOSS slDistance\nSET TARGET PROFIT tpDistance\nENDIF\n\n// 做空進場\nIF shortCondition AND NOT ShortOnMarket THEN\nSELLSHORT positionSize CONTRACTS AT MARKET\nSET STOP LOSS slDistance\nSET TARGET PROFIT tpDistance\nENDIF`
-            },
-            {
-                title: "金字塔",
-                tvCode: `//@version=5\nstrategy("黃金突破 + EMA + 金字塔加倉 (2.5手固定倉位版)", overlay=true, initial_capital=8000, pyramiding=5, default_qty_type=strategy.fixed, default_qty_value=2.5, currency=currency.USD)\n\n// ==========================================\n// 1. 參數輸入面板 (Inputs)\n// ==========================================\nvar string grp1 = "進場與趨勢過濾"\ndc_length = input.int(10, title="唐奇安通道週期", group=grp1)\nuse_ema   = input.bool(true, title="啟用 EMA 多空排列過濾", group=grp1)\n\nvar string grp2 = "下單與加倉設定"\nbase_qty = input.float(2.5, title="初始進場數量 (手/口)", group=grp2)\nadd_qty  = input.float(0.5, title="每次加碼數量 (手/口)", group=grp2)\nadd_step = input.float(8.0, title="加倉觸發間距 (USD)", group=grp2)\n\nvar string grp3 = "移動停損設定 (Trailing Stop)"\ntrail_dist = input.float(20.0, title="最高/低點回撤平倉距離 (USD)", group=grp3)\n\n// ==========================================\n// 2. 指標計算 (EMA 系統與通道)\n// ==========================================\ndc_upper = ta.highest(high, dc_length)[1]\ndc_lower = ta.lowest(low, dc_length)[1]\n\nema20  = ta.ema(close, 20)\nema50  = ta.ema(close, 50)\nema100 = ta.ema(close, 100)\nema200 = ta.ema(close, 200)\n\nplot(ema20,  color=color.new(color.green, 50),  title="EMA 20")\nplot(ema50,  color=color.new(color.blue, 50),   title="EMA 50")\nplot(ema100, color=color.new(color.orange, 50), title="EMA 100")\nplot(ema200, color=color.new(color.red, 50),    title="EMA 200", linewidth=2)\n\nis_bullish = (ema20 > ema50) and (ema50 > ema100) and (ema100 > ema200)\nis_bearish = (ema20 < ema50) and (ema50 < ema100) and (ema100 < ema200)\n\nlong_cond  = ta.crossover(close, dc_upper) and (use_ema ? is_bullish : true)\nshort_cond = ta.crossunder(close, dc_lower) and (use_ema ? is_bearish : true)\n\n// ==========================================\n// 3. 執行進場與加碼 (Execution)\n// ==========================================\nvar float last_entry_price = na\n\n// 初次進場 (固定 2.5 手)\nif long_cond and strategy.opentrades == 0\n    strategy.entry("Long_Base", strategy.long, qty=base_qty)`,
-                autoCode: `// ==========================================\n// 策略名稱：黃金突破 + EMA + 金字塔加倉 (ProOrder 實盤/自動交易版)\n// 本金規劃：$8,000 USD | 初始：2.5手 | 加碼：0.5手\n// 適用平台：ProRealTime ProOrder\n// ==========================================\n\n// ------------------------------------------\n// 1. 參數設定\n// ------------------------------------------\nDEFPARAM CumulateOrders = True  // 啟用金字塔加倉機制\n\nDCLength   = 10      // 唐奇安通道週期\nUseEMA     = 1       // 啟用 EMA 過濾 (1 = 啟用, 0 = 停用)\nAddStep    = 8.0     // 加倉觸發間距 (價格移動 8 USD)\nBaseQty    = 2.5     // 初始進場手數：2.5 手\nAddQty     = 0.5     // 每次加碼手數：0.5 手\nTrailDist  = 20.0    // 追蹤停損距離 (USD)\n\n// ------------------------------------------\n// 2. 指標計算 (EMA 與通道)\n// ------------------------------------------\nDCCUpper = HIGHEST[DCLength](HIGH)[1]\nDCCLower = LOWEST[DCLength](LOW)[1]\n\nEMA20  = ExponentialAverage[20](CLOSE)\nEMA50  = ExponentialAverage[50](CLOSE)\nEMA100 = ExponentialAverage[100](CLOSE)\nEMA200 = ExponentialAverage[200](CLOSE)\n\nIsBullish = (EMA20 > EMA50) AND (EMA50 > EMA100) AND (EMA100 > EMA200)\nIsBearish = (EMA20 < EMA50) AND (EMA50 < EMA100) AND (EMA100 < EMA200)\n\nLongCond  = (CLOSE CROSSES OVER DCCUpper) AND (UseEMA = 0 OR IsBullish)\nShortCond = (CLOSE CROSSES UNDER DCCLower) AND (UseEMA = 0 OR IsBearish)\n\n// ------------------------------------------\n// 3. 持倉狀態與追蹤停損 / 加碼邏輯\n// ------------------------------------------\nIF NOT ONMARKET THEN\nPosHigh = 0\nPosLow = 0\nLastEntryPrice = 0\nENDIF\n\n// --- 多頭持倉控管 ---\nIF LONGONMARKET THEN\nIF PosHigh = 0 THEN\nPosHigh = HIGH\nELSE\nPosHigh = MAX(PosHigh, HIGH)\nENDIF\n    \n// 計算多頭移動停損\nLongStopPrice = PosHigh - TrailDist\nSELL AT LongStopPrice STOP\n    \n// 多頭加碼：價格超越上次進場價 + AddStep 時，加碼 0.5 手\nIF CLOSE >= LastEntryPrice + AddStep THEN\nBUY AddQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nENDIF\nENDIF\n\n// --- 空頭持倉控管 ---\nIF SHORTONMARKET THEN\nIF PosLow = 0 THEN\nPosLow = LOW\nELSE\nPosLow = MIN(PosLow, LOW)\nENDIF\n    \n// 計算空頭移動停損\nShortStopPrice = PosLow + TrailDist\nEXITSHORT AT ShortStopPrice STOP\n    \n// 空頭加碼：價格低於上次進場價 - AddStep 時，加碼 0.5 手\nIF CLOSE <= LastEntryPrice - AddStep THEN\nSELLSHORT AddQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nENDIF\nENDIF\n\n// ------------------------------------------\n// 4. 初次進場執行 (Base Entry)\n// ------------------------------------------\nIF NOT ONMARKET THEN\nIF LongCond THEN\nBUY BaseQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nPosHigh = HIGH\nELSIF ShortCond THEN\nSELLSHORT BaseQty CONTRACTS AT MARKET\nLastEntryPrice = CLOSE\nPosLow = LOW\nENDIF\nENDIF`
+        // =========================================================================
+        // ⚙️ 設定區：請在這裡修改您的 Google 試算表資訊
+        // =========================================================================
+        const SPREADSHEET_ID = '你的Google試算表ID'; // 貼上你的 Google 試算表 ID
+        const GID = '0';                              // 貼上你的工作表 GID（預設第一頁通常是 0）
+        // =========================================================================
+
+        let allData = [];
+        let filteredData = [];
+
+        // 頁面載入完成後自動執行
+        window.onload = function() {
+            fetchData();
+        };
+
+        // 從 Google GViz API 抓取 JSON 資料
+        function fetchData() {
+            showLoading(true);
+            hideError();
+
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.classList.add('animate-spin');
+
+            // 建立 GViz API 請求 URL
+            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('無法存取 Google 試算表，請確認分享權限是否已開啟。');
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    // GViz 返回的格式為 google.visualization.Query.setResponse({...});
+                    // 需要將前後的 JS 函式包裹字串裁切掉，轉為純 JSON 格式
+                    const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                    const data = JSON.parse(jsonString);
+                    
+                    parseGoogleSheetsData(data);
+                    showLoading(false);
+                    refreshIcon.classList.remove('animate-spin');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('讀取資料失敗：' + error.message + '。請確保試算表已開啟「知道連結的人即可檢視」權限。');
+                    showLoading(false);
+                    refreshIcon.classList.remove('animate-spin');
+                });
+        }
+
+        // 解析 GViz JSON 物件
+        function parseGoogleSheetsData(gvizData) {
+            const table = gvizData.table;
+            if (!table || !table.rows || table.rows.length === 0) {
+                showError('試算表中沒有找到任何資料。');
+                return;
             }
-        ];
 
-        // 為了確保舊的快取資料不會污染網頁，重新載入或寫入 localStorage
-        localStorage.removeItem('tv_code_cards'); 
-        let cards = JSON.parse(localStorage.getItem('tv_code_cards')) || defaultCards;
-        let todos = JSON.parse(localStorage.getItem('tv_todos')) || [];
-        let cardTabStates = {};
+            // 取得表頭欄位名稱
+            const headers = table.cols.map(col => col ? (col.label || '').trim() : '');
+            
+            // 欄位名稱對應智慧判斷 (對應 Type, 分類, 標題, 內容)
+            let typeIdx = headers.findIndex(h => /type|類型/i.test(h));
+            let categoryIdx = headers.findIndex(h => /category|分類/i.test(h));
+            let titleIdx = headers.findIndex(h => /title|標題/i.test(h));
+            let contentIdx = headers.findIndex(h => /content|內容|描述|說明/i.test(h));
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            // 如果沒有抓到對應的欄位表頭，退回預設索引位置
+            if (typeIdx === -1) typeIdx = 0;
+            if (categoryIdx === -1) categoryIdx = 1;
+            if (titleIdx === -1) titleIdx = 2;
+            if (contentIdx === -1) contentIdx = 3;
+
+            allData = [];
+
+            // 逐列解析資料
+            table.rows.forEach((row, index) => {
+                const c = row.c;
+                if (!c) return;
+
+                const getValue = (idx) => {
+                    if (idx < 0 || idx >= c.length || !c[idx]) return '';
+                    // c[idx].v 為原始值，c[idx].f 為格式化後的顯示文字
+                    return (c[idx].f !== undefined && c[idx].f !== null) ? c[idx].f : (c[idx].v !== null ? c[idx].v : '');
+                };
+
+                const typeVal = String(getValue(typeIdx)).trim();
+                const categoryVal = String(getValue(categoryIdx)).trim();
+                const titleVal = String(getValue(titleIdx)).trim();
+                const contentVal = String(getValue(contentIdx)).trim();
+
+                // 排除空白資料列
+                if (typeVal || categoryVal || titleVal || contentVal) {
+                    allData.push({
+                        id: index,
+                        type: typeVal || '未分類',
+                        category: categoryVal || '通用',
+                        title: titleVal || '無標題',
+                        content: contentVal || ''
+                    });
+                }
+            });
+
+            // 更新篩選下拉選單選項
+            populateSelectOptions();
+
+            // 執行第一次篩選與渲染
+            filterData();
+
+            // 更新時間顯示
+            const now = new Date();
+            document.getElementById('statusMessage').textContent = `最後同步時間：${now.toLocaleTimeString()}`;
         }
 
-        function saveCardsToStorage() {
-            localStorage.setItem('tv_code_cards', JSON.stringify(cards));
+        // 動態產生下拉選單選項
+        function populateSelectOptions() {
+            const typeSelect = document.getElementById('typeFilter');
+            const categorySelect = document.getElementById('categoryFilter');
+
+            const currentType = typeSelect.value;
+            const currentCategory = categorySelect.value;
+
+            // 收集所有不重複的 Type 與 Category
+            const types = [...new Set(allData.map(item => item.type))].filter(Boolean);
+            const categories = [...new Set(allData.map(item => item.category))].filter(Boolean);
+
+            typeSelect.innerHTML = '<option value="">全部類型 (Type)</option>';
+            types.forEach(t => {
+                typeSelect.innerHTML += `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`;
+            });
+
+            categorySelect.innerHTML = '<option value="">全部分類 (Category)</option>';
+            categories.forEach(c => {
+                categorySelect.innerHTML += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`;
+            });
+
+            typeSelect.value = currentType;
+            categorySelect.value = currentCategory;
         }
 
-        function setCodeView(cardIndex, type) {
-            cardTabStates[cardIndex] = type;
-            renderCards();
+        // 搜尋與篩選主邏輯
+        function filterData() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedType = document.getElementById('typeFilter').value;
+            const selectedCategory = document.getElementById('categoryFilter').value;
+
+            filteredData = allData.filter(item => {
+                const matchesSearch = !searchValue || 
+                    item.title.toLowerCase().includes(searchValue) || 
+                    item.content.toLowerCase().includes(searchValue) ||
+                    item.type.toLowerCase().includes(searchValue) ||
+                    item.category.toLowerCase().includes(searchValue);
+
+                const matchesType = !selectedType || item.type === selectedType;
+                const matchesCategory = !selectedCategory || item.category === selectedCategory;
+
+                return matchesSearch && matchesType && matchesCategory;
+            });
+
+            renderGrid();
         }
 
-        function renderCards() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const grid = document.getElementById('cardGrid');
+        // 渲染卡片結果至畫面上
+        function renderGrid() {
+            const grid = document.getElementById('resultsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const resultCount = document.getElementById('resultCount');
 
-            const filtered = cards.filter(c => 
-                c.title.toLowerCase().includes(keyword) || 
-                (c.tvCode && c.tvCode.toLowerCase().includes(keyword)) ||
-                (c.autoCode && c.autoCode.toLowerCase().includes(keyword))
-            );
+            grid.innerHTML = '';
+            resultCount.textContent = `共計 ${filteredData.length} 筆資料`;
 
-            document.getElementById('cardCount').innerText = `共 ${filtered.length} 筆策略`;
+            if (filteredData.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                filteredData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow flex flex-col justify-between';
+                    
+                    // 根據內文是否包含網址自動轉換為超連結，並支援換行顯示
+                    const formattedContent = formatContent(item.content);
 
-            grid.innerHTML = filtered.map((card) => {
-                const realIndex = cards.indexOf(card);
-                const currentView = cardTabStates[realIndex] || 'tv';
-                const codeToShow = currentView === 'tv' ? card.tvCode : card.autoCode;
-
-                return `
-                <div class="card">
-                    <div>
-                        <div class="card-header">
-                            <span class="card-title">${card.title}</span>
-                            <span style="font-size: 0.8rem; color: #888;">No. ${String(realIndex + 1).padStart(3, '0')}</span>
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-100">
+                                    ${escapeHtml(item.type)}
+                                </span>
+                                <span class="bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5 rounded">
+                                    ${escapeHtml(item.category)}
+                                </span>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 mb-2 leading-snug">
+                                ${escapeHtml(item.title)}
+                            </h3>
+                            <div class="text-slate-600 text-sm whitespace-pre-line leading-relaxed">
+                                ${formattedContent}
+                            </div>
                         </div>
-                        <div class="code-type-tabs">
-                            <button class="code-type-btn ${currentView === 'tv' ? 'active' : ''}" onclick="setCodeView(${realIndex}, 'tv')">TradingView 程式碼</button>
-                            <button class="code-type-btn ${currentView === 'auto' ? 'active' : ''}" onclick="setCodeView(${realIndex}, 'auto')">自動化程式碼</button>
-                        </div>
-                        <div class="card-body">${escapeHtml(codeToShow || '無程式碼資料')}</div>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn-copy" onclick="copyByIndex(${realIndex}, '${currentView}')">
-                            <i class="fa-regular fa-copy"></i> 複製程式碼
-                        </button>
-                        <button class="btn-icon" onclick="openModal(${realIndex})" title="修改">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="btn-icon" onclick="deleteCard(${realIndex})" title="刪除">
-                            <i class="fa-solid fa-trash" style="color: #e53935;"></i>
-                        </button>
-                    </div>
-                </div>
-                `;
-            }).join('');
+                    `;
+                    grid.appendChild(card);
+                });
+            }
         }
 
-        function escapeHtml(text) {
-            return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
-        }
-
-        function copyByIndex(realIndex, currentView) {
-            const card = cards[realIndex];
-            const textToCopy = currentView === 'tv' ? card.tvCode : card.autoCode;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                alert('程式碼已成功複製到剪貼簿！');
+        // 格式化內文：轉換網址為可點擊連結
+        function formatContent(text) {
+            if (!text) return '';
+            const escaped = escapeHtml(text);
+            // 偵測 HTTP/HTTPS 網址並轉為 <a> 標籤
+            const urlPattern = /(https?:\/\/[^\s]+)/g;
+            return escaped.replace(urlPattern, url => {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all inline-flex items-center">
+                    ${url}
+                    <svg class="w-3 h-3 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </a>`;
             });
         }
 
-        function deleteCard(index) {
-            if (confirm('確定要刪除這筆策略嗎？')) {
-                cards.splice(index, 1);
-                saveCardsToStorage();
-                renderCards();
-            }
+        // XSS 安全防護：轉義 HTML 特殊字元
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
-        function openModal(index = null) {
-            const modal = document.getElementById('cardModal');
-            modal.style.display = 'flex';
-            if (index !== null) {
-                document.getElementById('modalTitle').innerText = '修改策略';
-                document.getElementById('editIndex').value = index;
-                document.getElementById('inputTitle').value = cards[index].title;
-                document.getElementById('inputTvCode').value = cards[index].tvCode || '';
-                document.getElementById('inputAutoCode').value = cards[index].autoCode || '';
+        // 顯示 / 隱藏 Loading 載入動畫
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) {
+                loading.classList.remove('hidden');
+                document.getElementById('resultsGrid').innerHTML = '';
+                document.getElementById('emptyState').classList.add('hidden');
             } else {
-                document.getElementById('modalTitle').innerText = '新增策略';
-                document.getElementById('editIndex').value = '';
-                document.getElementById('inputTitle').value = '';
-                document.getElementById('inputTvCode').value = '';
-                document.getElementById('inputAutoCode').value = '';
+                loading.classList.add('hidden');
             }
         }
 
-        function closeModal() {
-            document.getElementById('cardModal').style.display = 'none';
+        // 顯示錯誤訊息
+        function showError(msg) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = msg;
+            errorDiv.classList.remove('hidden');
         }
 
-        function saveCard() {
-            const idx = document.getElementById('editIndex').value;
-            const title = document.getElementById('inputTitle').value.trim() || '未命名策略';
-            const tvCode = document.getElementById('inputTvCode').value.trim();
-            const autoCode = document.getElementById('inputAutoCode').value.trim();
-
-            if (idx !== '') {
-                cards[idx] = { title, tvCode, autoCode };
-            } else {
-                cards.push({ title, tvCode, autoCode });
-            }
-
-            saveCardsToStorage();
-            closeModal();
-            renderCards();
+        // 隱藏錯誤訊息
+        function hideError() {
+            document.getElementById('errorMessage').classList.add('hidden');
         }
-
-        // 待辦事項 logic
-        function saveTodosToStorage() {
-            localStorage.setItem('tv_todos', JSON.stringify(todos));
-        }
-
-        function renderTodos() {
-            const list = document.getElementById('todoList');
-            list.innerHTML = todos.map((todo, index) => `
-                <li class="todo-item ${todo.completed ? 'completed' : ''}">
-                    <div class="todo-item-left" onclick="toggleTodo(${index})">
-                        <input type="checkbox" ${todo.completed ? 'checked' : ''}>
-                        <span>${escapeHtml(todo.text)}</span>
-                    </div>
-                    <button class="delete-todo-btn" onclick="deleteTodo(${index})">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </li>
-            `).join('');
-        }
-
-        function addTodo() {
-            const input = document.getElementById('todoInput');
-            const text = input.value.trim();
-            if (text) {
-                todos.push({ text, completed: false });
-                input.value = '';
-                saveTodosToStorage();
-                renderTodos();
-            }
-        }
-
-        function toggleTodo(index) {
-            todos[index].completed = !todos[index].completed;
-            saveTodosToStorage();
-            renderTodos();
-        }
-
-        function deleteTodo(index) {
-            todos.splice(index, 1);
-            saveTodosToStorage();
-            renderTodos();
-        }
-
-        // 初始化
-        renderCards();
-        renderTodos();
     </script>
 </body>
 </html>
