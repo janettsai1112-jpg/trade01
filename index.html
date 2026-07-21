@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TradingView 交易策略寶庫 & 雙人日期待辦</title>
-    <!-- FontAwesome 圖示 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -38,7 +36,6 @@
             min-height: 100vh;
         }
 
-        /* 導覽列 */
         .nav-tabs {
             display: flex;
             gap: 15px;
@@ -87,15 +84,6 @@
             flex-wrap: wrap;
         }
 
-        .sheet-sync-bar input {
-            padding: 8px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            width: 380px;
-            font-size: 0.85rem;
-            outline: none;
-        }
-
         .btn-sync {
             background-color: #1d6f42;
             color: white;
@@ -114,6 +102,49 @@
             cursor: not-allowed;
         }
 
+        .auto-sync-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .auto-sync-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .auto-sync-toggle input {
+            cursor: pointer;
+        }
+
+        .sync-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: inline-block;
+        }
+
+        .sync-status-dot.live {
+            background-color: #22c55e;
+            box-shadow: 0 0 0 0 rgba(34,197,94, 0.7);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { box-shadow: 0 0 0 0 rgba(34,197,94, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(34,197,94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34,197,94, 0); }
+        }
+
         .tab-content {
             display: none;
             width: 100%;
@@ -124,7 +155,6 @@
             display: block;
         }
 
-        /* 搜尋列與卡片 */
         .search-box {
             position: relative;
             max-width: 600px;
@@ -173,9 +203,7 @@
         }
 
         @media (max-width: 600px) {
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
+            .card-grid { grid-template-columns: 1fr; }
         }
 
         .card {
@@ -268,7 +296,6 @@
             color: #555;
         }
 
-        /* ===== 雙人日期待辦卡片 ===== */
         .todo-controls {
             background-color: #fff;
             border-radius: 16px;
@@ -319,9 +346,7 @@
         }
 
         @media (max-width: 600px) {
-            .date-cards-grid {
-                grid-template-columns: 1fr;
-            }
+            .date-cards-grid { grid-template-columns: 1fr; }
         }
 
         .date-card {
@@ -348,7 +373,6 @@
         .date-card-body {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            divide-x: 1px solid var(--border-color);
             min-height: 180px;
         }
 
@@ -427,7 +451,6 @@
 
         .btn-del-item:hover { opacity: 1; }
 
-        /* Modal 彈窗 */
         .modal {
             display: none;
             position: fixed;
@@ -474,10 +497,9 @@
 </head>
 <body>
 
-    <!-- 頁籤選單 -->
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('code-tab')"><i class="fa-solid fa-code"></i> 交易程式碼寶庫</button>
-        <button class="tab-btn" onclick="switchTab('todo-tab')"><i class="fa-solid fa-calendar-days"></i> 雙人日期待辦卡牌</button>
+        <button class="tab-btn active" onclick="switchTab('code-tab', event)"><i class="fa-solid fa-code"></i> 交易程式碼寶庫</button>
+        <button class="tab-btn" onclick="switchTab('todo-tab', event)"><i class="fa-solid fa-calendar-days"></i> 雙人日期待辦卡牌</button>
     </div>
 
     <!-- ===== 分頁一：交易程式碼 ===== -->
@@ -485,13 +507,19 @@
         <div class="header">
             <h1>TradingView 交易策略寶庫</h1>
             <p>即時查閱 TradingView Pine Script 與自動化交易程式碼</p>
-            
-            <!-- 發佈至網路同步控制列 -->
+
             <div class="sheet-sync-bar">
-                <input type="text" id="csvUrlInput" placeholder="貼上 Google 試算表連結 (或發佈的網址)...">
-                <button class="btn-sync" id="btnSync" onclick="syncFromGoogleSheet()">
-                    <i class="fa-solid fa-rotate"></i> 同步試算表資料
+                <button class="btn-sync" id="btnSync" onclick="syncFromGoogleSheet(false)">
+                    <i class="fa-solid fa-rotate"></i> 立即同步
                 </button>
+            </div>
+
+            <div class="auto-sync-row">
+                <label class="auto-sync-toggle">
+                    <input type="checkbox" id="autoSyncToggle" checked onchange="onAutoSyncToggle()">
+                    自動同步（每 <span id="intervalLabel">30</span> 秒）
+                </label>
+                <span><span class="sync-status-dot" id="syncStatusDot"></span> <span id="syncStatusText">尚未同步</span></span>
             </div>
         </div>
 
@@ -548,7 +576,11 @@
     </div>
 
     <script>
-        // 預設策略資料
+        // ===== 固定的 Google 試算表來源（不需要使用者手動貼連結）=====
+        const SHEET_DOC_ID = '1u4KvOKEwK-fySVfVHKu_jTC3JNyNHWXza6E1pv-4Jbo';
+        const SHEET_GID = '68707879';
+
+        // ===== 預設資料（找不到 localStorage 資料時的初始值） =====
         const defaultCards = [
             {
                 title: "唐奇安通道",
@@ -562,7 +594,6 @@
             }
         ];
 
-        // 預設待辦事項資料
         const todayStr = new Date().toISOString().split('T')[0];
         const defaultTodos = [
             { id: 1, date: todayStr, person: "A", text: "完成唐奇安通道 5分K 參數調校", completed: false },
@@ -572,52 +603,71 @@
         let cards = JSON.parse(localStorage.getItem('tv_code_cards')) || defaultCards;
         let todos = JSON.parse(localStorage.getItem('tv_todos_v2')) || defaultTodos;
         let cardTabStates = {};
+        let autoSyncEnabled = localStorage.getItem('tv_auto_sync') !== 'false';
+        let autoSyncTimer = null;
+        const AUTO_SYNC_INTERVAL_MS = 30000; // 每 30 秒自動同步一次
+        let lastCardsSignature = JSON.stringify(cards);
 
-        // 載入上次儲存的 試算表 連結
-        const savedSheetUrl = localStorage.getItem('tv_sheet_url');
-        if (savedSheetUrl) {
-            document.getElementById('csvUrlInput').value = savedSheetUrl;
-        }
-
-        document.getElementById('todoDateInput').value = todayStr;
-
-        function switchTab(tabId) {
+        function switchTab(tabId, evt) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+        }
+
+        // ===== 自動同步控制 =====
+        function onAutoSyncToggle() {
+            autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
+            localStorage.setItem('tv_auto_sync', String(autoSyncEnabled));
+            if (autoSyncEnabled) {
+                startAutoSync();
+            } else {
+                stopAutoSync();
+                updateSyncStatus('idle', '自動同步已關閉');
+            }
+        }
+
+        function startAutoSync() {
+            stopAutoSync();
+            if (!autoSyncEnabled) return;
+            autoSyncTimer = setInterval(() => syncFromGoogleSheet(true), AUTO_SYNC_INTERVAL_MS);
+        }
+
+        function stopAutoSync() {
+            if (autoSyncTimer) {
+                clearInterval(autoSyncTimer);
+                autoSyncTimer = null;
+            }
+        }
+
+        function updateSyncStatus(state, text) {
+            const dot = document.getElementById('syncStatusDot');
+            const label = document.getElementById('syncStatusText');
+            dot.classList.remove('live');
+            if (state === 'live') dot.classList.add('live');
+            label.innerText = text;
+        }
+
+        function formatTimeNow() {
+            const d = new Date();
+            return d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
         // ===== 使用 GViz API 自動擷取與解析 Google 試算表 =====
-        async function syncFromGoogleSheet() {
-            const rawUrl = document.getElementById('csvUrlInput').value.trim();
-            if (!rawUrl) {
-                alert('請先貼上 Google 試算表連結！');
-                return;
-            }
-
+        async function syncFromGoogleSheet(silent) {
             const btnSync = document.getElementById('btnSync');
-            btnSync.disabled = true;
-            btnSync.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 同步中...`;
+            if (!silent) {
+                btnSync.disabled = true;
+                btnSync.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 同步中...`;
+            }
+            updateSyncStatus('syncing', '同步中...');
 
             try {
-                // 自動提煉 Sheet ID 與 gid
-                const docIdMatch = rawUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                if (!docIdMatch) {
-                    throw new Error('無法識別 Google 試算表 ID，請確認連結格式！');
-                }
-                const docId = docIdMatch[1];
+                const gvizUrl = `https://docs.google.com/spreadsheets/d/${SHEET_DOC_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
 
-                const gidMatch = rawUrl.match(/[?&]gid=([0-9]+)/);
-                const gid = gidMatch ? gidMatch[1] : '0';
-
-                // 構建 GViz API URL
-                const gvizUrl = `https://docs.google.com/spreadsheets/d/${docId}/gviz/tq?tqx=out:json&gid=${gid}`;
-
-                const response = await fetch(gvizUrl);
+                const response = await fetch(gvizUrl, { cache: 'no-store' });
                 const text = await response.text();
 
-                // 解析 GViz JSON (裁切掉前面與後面的 JS 包裝碼)
                 const jsonStart = text.indexOf('{');
                 const jsonEnd = text.lastIndexOf('}') + 1;
                 if (jsonStart === -1 || jsonEnd === -1) {
@@ -627,33 +677,38 @@
                 const jsonString = text.substring(jsonStart, jsonEnd);
                 const data = JSON.parse(jsonString);
 
-                parseGvizDataToCards(data);
+                const changed = parseGvizDataToCards(data, silent);
 
-                // 儲存成功的 URL 方便下次使用
-                localStorage.setItem('tv_sheet_url', rawUrl);
-                alert('成功同步 Google 試算表策略資料！');
+                const timeStr = formatTimeNow();
+                updateSyncStatus('live', (changed ? '已更新 · ' : '已是最新 · ') + timeStr);
+
+                if (!silent && changed) alert('成功同步 Google 試算表策略資料！');
+                if (!silent && !changed) alert('已連線成功，目前資料與試算表一致。');
             } catch (err) {
-                alert('同步失敗：' + err.message);
+                updateSyncStatus('idle', '同步失敗：' + err.message);
+                if (!silent) alert('同步失敗：' + err.message);
                 console.error(err);
             } finally {
-                btnSync.disabled = false;
-                btnSync.innerHTML = `<i class="fa-solid fa-rotate"></i> 同步試算表資料`;
+                if (!silent) {
+                    btnSync.disabled = false;
+                    btnSync.innerHTML = `<i class="fa-solid fa-rotate"></i> 立即同步`;
+                }
             }
         }
 
-        function parseGvizDataToCards(data) {
+        // 回傳是否有實際變動
+        function parseGvizDataToCards(data, silent) {
             const table = data.table;
-            if (!table || !table.rows || table.rows.length === 0) return;
+            if (!table || !table.rows || table.rows.length === 0) return false;
 
             const newCards = [];
-            
-            // 判斷是否有標題列（第 0 列）
+
             let startIndex = 0;
             const firstRowCells = table.rows[0].c;
             if (firstRowCells && firstRowCells[0] && firstRowCells[0].v) {
                 const firstVal = String(firstRowCells[0].v).toLowerCase();
                 if (firstVal.includes('標題') || firstVal.includes('title') || firstVal.includes('名稱') || firstVal.includes('策略')) {
-                    startIndex = 1; // 跳過標題列
+                    startIndex = 1;
                 }
             }
 
@@ -674,13 +729,21 @@
                 }
             }
 
-            if (newCards.length > 0) {
-                cards = newCards;
-                localStorage.setItem('tv_code_cards', JSON.stringify(cards));
-                renderCards();
-            } else {
-                alert('沒有在試算表中讀取到有效資料！');
+            if (newCards.length === 0) {
+                if (!silent) alert('沒有在試算表中讀取到有效資料！');
+                return false;
             }
+
+            const newSignature = JSON.stringify(newCards);
+            if (newSignature === lastCardsSignature) {
+                return false;
+            }
+
+            lastCardsSignature = newSignature;
+            cards = newCards;
+            localStorage.setItem('tv_code_cards', JSON.stringify(cards));
+            renderCards();
+            return true;
         }
 
         // ===== 卡片渲染邏輯 =====
@@ -688,8 +751,8 @@
             const keyword = document.getElementById('searchInput').value.toLowerCase();
             const grid = document.getElementById('cardGrid');
 
-            const filtered = cards.filter(c => 
-                c.title.toLowerCase().includes(keyword) || 
+            const filtered = cards.filter(c =>
+                c.title.toLowerCase().includes(keyword) ||
                 (c.tvCode && c.tvCode.toLowerCase().includes(keyword)) ||
                 (c.autoCode && c.autoCode.toLowerCase().includes(keyword))
             );
@@ -745,6 +808,7 @@
             if (confirm('確定要刪除這筆策略嗎？')) {
                 cards.splice(index, 1);
                 localStorage.setItem('tv_code_cards', JSON.stringify(cards));
+                lastCardsSignature = JSON.stringify(cards);
                 renderCards();
             }
         }
@@ -779,6 +843,7 @@
             if (idx !== '') cards[idx] = { title, tvCode, autoCode };
             else cards.push({ title, tvCode, autoCode });
 
+            lastCardsSignature = JSON.stringify(cards);
             localStorage.setItem('tv_code_cards', JSON.stringify(cards));
             closeModal();
             renderCards();
@@ -787,7 +852,7 @@
         // ===== 雙人日期待辦卡牌邏輯 =====
         function renderDateCards() {
             const grid = document.getElementById('dateCardsGrid');
-            
+
             const groupedByDate = {};
             todos.forEach(t => {
                 if (!groupedByDate[t.date]) groupedByDate[t.date] = [];
@@ -815,7 +880,6 @@
                         </button>
                     </div>
                     <div class="date-card-body">
-                        <!-- 左側：成員 A -->
                         <div class="person-column">
                             <div class="person-header person-a-tag">
                                 <i class="fa-solid fa-user"></i> 成員 A
@@ -824,7 +888,6 @@
                                 ${renderTodoListItems(itemsA)}
                             </ul>
                         </div>
-                        <!-- 右側：成員 B -->
                         <div class="person-column">
                             <div class="person-header person-b-tag">
                                 <i class="fa-solid fa-user-check"></i> 成員 B
@@ -901,9 +964,16 @@
             return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
         }
 
-        // 初始化
+        // ===== 初始化 =====
+        document.getElementById('todoDateInput').value = todayStr;
+        document.getElementById('autoSyncToggle').checked = autoSyncEnabled;
+        document.getElementById('intervalLabel').innerText = String(AUTO_SYNC_INTERVAL_MS / 1000);
+
         renderCards();
         renderDateCards();
+        updateSyncStatus('idle', '準備連線...');
+        syncFromGoogleSheet(true);
+        if (autoSyncEnabled) startAutoSync();
     </script>
 </body>
 </html>
